@@ -3,11 +3,16 @@
 
 ## 初始化`Harvester`
 ```shell
+<<<<<<< HEAD
+=======
+source  /root/chia-blockchain/activate
+>>>>>>> 83c5313 (第二次提交)
 chia init && chia init -c /root/ca
 ```
 
 ## 更改`/etc/hosts`文件
 ```shell
+<<<<<<< HEAD
 
 ```
 
@@ -28,3 +33,40 @@ self_hostname
 
 
 ## 查看是否有启动问题
+=======
+将harv0729指向自己的内网IP
+使用根下的change_hosts
+```
+> 在下面的配置文件中会用到这个`harv0729`,可以为任意地址,需要与配置文件中的地址相同
+
+## 检查配置文件,需要为对应项
+```shell
+vim /root/.chia/mainnet/config/config.yaml
+self_hostname: harv0729
+log_level: INFO
+plot_directories: 一般都是正确的
+```
+
+## 放入`rclone.conf`文件
+> 保证挂载的gd数量为100个,并且格式更改为unix格式,将文件中的/r去掉后,文件格式就可以了
+```shell
+sed -i "s#\r##g" /root/.config/rclone/rclone.conf
+
+## 挂载磁盘
+使用根下的`rclone`
+
+## 启动`Harvester`
+chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
+
+当日志显示`INFO`时,差不多就没有问题了
+
+```shell
+source  /root/chia-blockchain/activate
+chia init && chia init -c /root/ca
+bash /root/change_hosts
+grep -e "self_hostname" -e"log_level" -e"plot_directories" /root/.chia/mainnet/config/config.yaml
+
+
+sed -i "s#\r##g" /root/.config/rclone/rclone.conf
+chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
+>>>>>>> 83c5313 (第二次提交)
