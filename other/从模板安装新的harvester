@@ -1,0 +1,30 @@
+# 从模板机安装新的Harvester
+[TOC]
+
+## 初始化`Harvester`
+```shell
+chia init && chia init -c /root/ca
+```
+
+## 更改`/etc/hosts`文件
+```shell
+
+```
+
+## 检查配置文件
+```shell
+vim /root/.chia/mainnet/config/config.yaml
+self_hostname
+日志级别
+```
+
+## 放入`rclone.conf`文件
+
+
+## 挂载磁盘
+
+
+## 启动`Harvester`
+
+
+## 查看是否有启动问题
