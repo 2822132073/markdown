@@ -1,0 +1,24 @@
+# Es的节点类型
+
+[TOC]
+
+Elasticsearch有以下几种角色:
+- `master`: 可以成为主节点的节点
+- `data`: 存储数据的节点
+- `data_content`
+- `data_hot`: 经常查询修改的数据,需要更好的硬件,例如SSD
+- `data_warm`:查询频率低于`data_hot`的数据,存储的节点
+- `data_cold`:查询频率低于`data_hot`和`data_warm`的数据存储的节点,以确保成本
+- `data_frozen`
+- `ingest`
+- `ml`
+- `remote_cluster_client`
+- `transform`
+
+
+
+> 每个节点都需要一下的角色:
+> - `master`
+> - `data`或`data_content`和`data_hot`
+
+有些特定的功能需要特定的角色
