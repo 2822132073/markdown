@@ -69,4 +69,9 @@ grep -e "self_hostname" -e"log_level" -e"plot_directories" /root/.chia/mainnet/c
 
 sed -i "s#\r##g" /root/.config/rclone/rclone.conf
 chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
->>>>>>> 83c5313 (第二次提交)
+```
+
+
+```shell
+source  /root/chia-blockchain/activate
+chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
