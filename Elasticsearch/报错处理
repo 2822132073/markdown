@@ -1,0 +1,16 @@
+
+
+
+## Waiting until all Elasticsearch nodes are compatible with Kibana before starting saved objects migrations...
+> 在更新使用kibana节点后,由于原来的Es节点中有以前的kibana的index,需要将其删除后,在启动kibana
+
+解决方案:
+```shell
+[root@cq49 elasticsearch7.14.0-ik]# curl -XGET cq7-104:32408/_cat/indices |grep .kibana_ |awk '{print $3}'
+.kibana_7.14.0_001
+.kibana_task_manager_7.14.0_001
+.kibana_task_manager_1
+.kibana_1
+[root@cq49 elasticsearch7.14.0-ik]# curl -XDELETE http://cq7-104:32408/.kibana_1
+```
+> 上面这些索引,需要删除 `.kibana_1`,如果没有这个索引,就删除相似特征的,比如:`.kibana_2`这种

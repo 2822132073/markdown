@@ -1,0 +1,46 @@
+7128480b9293b6f225719688eb9bedf8  lucene-core-8.9.0.jar 旧
+522f2abc20c54dad5c3ab08e545149f4  lucene-core-8.9.0.jar 新
+
+522f2abc20c54dad5c3ab08e545149f4  lib/lucene-core-8.9.0.jar
+
+## 先停止服务
+kubectl scale --replicas=0 deployment -n similar similar-realtime-cn
+kubectl scale --replicas=0 deployment -n similar similar-service-cn-heavy
+kubectl scale --replicas=0 deployment -n similar similar-service-cn-part
+kubectl scale --replicas=0 deployment -n similar similar-service-en
+
+
+## 再更新镜像
+kubectl set image ds -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik:7.14.0  similar-local-ssd-pro7-10-data
+kubectl set image sts -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik:7.14.0 similar-local-ssd-pro7-10-master
+kubectl set image sts -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik:7.14.0 similar-local-ssd-pro7-10-ingest
+kubectl set image deploy -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/kibana:7.14.0 kibana-similar-local-ssd-pro7-10
+
+
+## 再恢复服务
+kubectl scale --replicas=5 deployment -n similar similar-realtime-cn
+kubectl scale --replicas=10 deployment -n similar similar-service-cn-heavy
+kubectl scale --replicas=20 deployment -n similar similar-service-cn-part
+kubectl scale --replicas=2 deployment -n similar similar-service-en
+
+
+## 如果上面的那个镜像不能使用,就用这个镜像
+kubectl set image ds -n similar-local-es-7-10 similar-local-ssd-pro7-10-data *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik-not-add:7.14.0
+kubectl set image sts -n similar-local-es-7-10 similar-local-ssd-pro7-10-master *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik-not-add:7.14.0
+kubectl set image sts -n similar-local-es-7-10 similar-local-ssd-pro7-10-ingest *=harbor.laibokeji.com/elasticsearch/elasticsearch-ik-not-add:7.14.0
+
+
+## 实在不行就回滚镜像
+kubectl rollout undo -n similar-local-es-7-10 similar-local-ssd-pro7-10-data
+kubectl rollout undo -n similar-local-es-7-10 similar-local-ssd-pro7-10-master
+kubectl rollout undo -n similar-local-es-7-10 similar-local-ssd-pro7-10-ingest
+kubectl rollout undo -n similar-local-es-7-10 kibana-similar-local-ssd-pro7-10
+
+
+
+
+## 恢复成原始镜像
+kubectl set image ds -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch:7.10.0-ik  similar-local-ssd-pro7-10-data
+kubectl set image sts -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch:7.10.0-ik similar-local-ssd-pro7-10-master
+kubectl set image sts -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/elasticsearch:7.10.0-ik similar-local-ssd-pro7-10-ingest
+kubectl set image deploy -n similar-local-es-7-10  *=harbor.laibokeji.com/elasticsearch/kibana:7.10.0 kibana-similar-local-ssd-pro7-10
