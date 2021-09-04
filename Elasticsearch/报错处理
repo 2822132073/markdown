@@ -6,11 +6,12 @@
 
 解决方案:
 ```shell
+先停止kibana,再删除索引
 [root@cq49 elasticsearch7.14.0-ik]# curl -XGET cq7-104:32408/_cat/indices |grep .kibana_ |awk '{print $3}'
 .kibana_7.14.0_001
 .kibana_task_manager_7.14.0_001
 .kibana_task_manager_1
 .kibana_1
-[root@cq49 elasticsearch7.14.0-ik]# curl -XDELETE http://cq7-104:32408/.kibana_1
+[root@cq49 elasticsearch7.14.0-ik]# curl -XDELETE http://localhost:9200/.kibana*
 ```
 > 上面这些索引,需要删除 `.kibana_1`,如果没有这个索引,就删除相似特征的,比如:`.kibana_2`这种
