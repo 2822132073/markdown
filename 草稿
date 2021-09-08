@@ -223,3 +223,84 @@ screen -dmS 2 scp -r cq7-116/uFP1ISnyTuqNd_ZooNEhgQ/* cq204:/var/lib/kubelet/plu
 2.解决更新插件后,无法开启kibana问题
 3.更新locales下es测试集群
 4.检查新到磁盘保修日期是否正常
+
+
+
+
+
+clientID
+https://console.cloud.google.com/getting-started?pli=1
+
+
+
+
+
+
+# 当日新增: 当前gd数据总和 - 当前gd数据总和(昨日)total
+# 郭总数据: 在网页查看
+郭总新增: 郭总数据- 郭总数据(昨日)
+# gcp新增: 当日新增- 郭总新增
+
+
+
+hello@idealschoolmanipur.com
+
+
+school@eklavyamodelrschool.com
+
+
+
+# 1、这一段代码是安装rclone环境，已经添加对应配置文件，相关文件都存在共享云盘中
+!sh /content/drive/Shareddrives/mysql1/rclone.sh
+!rclone config file
+!cp /content/drive/Shareddrives/mysql1/16rclone800.txt /root/.config/rclone/rclone.conf
+!gcloud auth activate-service-account --key-file /content/drive/Shareddrives/mysql1/esdata777.json
+!pip install redis
+!gsutil ls gs://esdata777  | grep plot| wc -l
+!cp /content/drive/Shareddrives/mysql1/rclone_all.txt /root/.config/rclone/rclone.conf
+2.统计GD数量
+import os
+import subprocess
+import configparser
+import redis
+filename='/root/.config/rclone/rclone.conf'
+conf = configparser.ConfigParser()
+conf.read(filename, encoding='utf8')
+remotes = conf.sections()
+3.# 统计所有GD数据总和与redis总数
+# 多线程统计每个盘的数量信息
+from multiprocessing import Pool
+
+def pri(remote):
+  message = subprocess.getoutput("rclone ls " + remote + ":|wc -l")
+  return remote,message
+
+with Pool(40) as p:
+  ret = p.map(pri, remotes)
+print(ret)
+number = 222322
+for num in ret:
+  if "ERROR" in num[1] or "NOTICE" in num[1] :
+    n = subprocess.getoutput(f"rclone ls {num[0]}:|wc -l")
+  elif len(num[1]) > 10:
+    print(num)
+    continue
+  else:
+    n = num[1]
+  number = number + int(n)
+print("GD当前gd数据总和:",number)
+r = redis.StrictRedis(host="34.139.58.49 ",password="r@12g",db=0)
+set_list = ["bucket2_handle_plot_set","bucket3_handle_plot_set","handle_plot_set"]
+total = 0
+for set_name in set_list:
+    total = total + r.scard(set_name)
+print("当前redis数量",total)
+
+
+
+1. 测试新到的机器
+2. 生成gd的配置文件
+3. 生成gd账号clientID
+
+
+contact@mountliterahazaribagh.com
