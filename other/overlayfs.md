@@ -6,7 +6,7 @@
 
 ## overlayfs基本原理
 
-![img](D:\markdown\other\overlayfs.assets\1580705-20191230141201863-1669781061.png)
+![img](.\overlayfs.assets\1580705-20191230141201863-1669781061.png)
 
 
 
@@ -70,13 +70,13 @@ mount -t overlay overlay -o lowerdir=lowerdir3:lowerdir2:lowerdir1,upperdir=uppe
 
 ### 验证结果
 
-![image-20220426203746110](D:\markdown\other\overlayfs.assets\image-20220426203746110.png)
+![image-20220426203746110](.\overlayfs.assets\image-20220426203746110.png)
 
-![image-20220426203824505](D:\markdown\other\overlayfs.assets\image-20220426203824505.png)
+![image-20220426203824505](.\overlayfs.assets\image-20220426203824505.png)
 
 >  在修改lower文件后,文件会先被拷贝到upper层,再进行修改
 
-![image-20220426203947123](D:\markdown\other\overlayfs.assets\image-20220426203947123.png)
+![image-20220426203947123](.\overlayfs.assets\image-20220426203947123.png)
 
 ### 结论
 
