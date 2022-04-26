@@ -1,18 +1,22 @@
 # 从模板机安装新的Harvester
 [TOC]
 
+## 替换/root/rclonemount.sh
+
+```shell
+ansible tmp -mcopy -a"src=rclonemount.sh dest=/root/rclonemount.sh backup=yes"
+```
 ## 初始化`Harvester`
+
 ```shell
 source  /root/chia-blockchain/activate
 chia init && chia init -c /root/ca
 ```
 
-## 更改`/etc/hosts`文件
-```shell
-
-```
-
 ## 检查配置文件
+
+> 这一步可以使用脚本`/root/change_hosts`实现
+
 ```shell
 vim /root/.chia/mainnet/config/config.yaml
 self_hostname
@@ -22,7 +26,15 @@ self_hostname
 ## 放入`rclone.conf`文件
 
 
+
+```shell
+mv -f rclone.conf /root/.config/rclone/rclone.conf
+```
+
+
+
 ## 挂载磁盘
+
 ```shell
 bash /root/rclonemount.sh
 
@@ -55,18 +67,24 @@ sed -i "s#\r##g" /root/.config/rclone/rclone.conf
 ## 启动`Harvester`
 chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
 
-ansible all -mcopy -a"src=rclonemount.sh dest=/root/rclonemount.sh backup=yes"
+
 
 当日志显示`INFO`时,差不多就没有问题了
+ansible all -mcopy -a"src=rclonemount.sh dest=/root/rclonemount.sh backup=yes"
+
 
 ```shell
 source  /root/chia-blockchain/activate
 chia init && chia init -c /root/ca
 bash /root/change_hosts
 grep -e "self_hostname" -e"log_level" -e"plot_directories" /root/.chia/mainnet/config/config.yaml
+mkdir /rootfsl && cd /root/fsl
 
-
-sed -i "s#\r##g" /root/.config/rclone/rclone.conf && for i in {1..100};do umount /mnt/$i ;done && bash /root/rclonemount.sh
+cp rclone* rclone.conf
+mv -f rclone.conf /root/.config/rclone/rclone.conf
+md5sum rclone*
+md5sum /root/.config/rclone/rclone.conf
+sed -i "s#\r##g" /root/.config/rclone/rclone.conf && for i in {1..100};do umount /mnt/$i ;done ; bash /root/rclonemount.sh
 chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
 ```
 
@@ -74,7 +92,20 @@ chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
 
 ```shell
 source  /root/chia-blockchain/activate
+sed -i "s#\r##g" /root/.config/rclone/rclone.conf && for i in {1..100};do umount /mnt/$i ;done ; bash /root/rclonemount.sh
 chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
 
 
+## 重新挂载
+for i in {1..100};do umount /mnt/$i ;done ; bash /root/rclonemount.sh
+
 ```
+
+source  /root/chia-blockchain/activate
+
+chia start harvester -r && tail -f /root/.chia/mainnet/log/debug.log
+
+chia stop harvester && tail -f /root/.chia/mainnet/log/debug.log
+
+source  /root/chia-blockchain/activate;chia stop harvester ;for i in {1..100};do umount /mnt/$i ;done ; bash /root/rclonemount.sh;chia start harvester
+

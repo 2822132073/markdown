@@ -1,0 +1,35 @@
+## `ubuntu16`
+
+> 默认使用`/etc/network/interfaces`管理网络,但是也可以使用`nmcli`管理网络,建议开启`nmcli`,便于管理,在多个平台都可以使用`nmcli`管理网络
+>
+> 如果没有安装`nmcli`,也无法获取ip,需要使用`netplan`进行管理网络,可以看一下`/usr/share/doc/netplan/examples`下的示例,将其复制到`/etc/netplan`下,再对其进行编辑
+>
+> ```shell
+> cp /usr/share/doc/netplan/examples/static.yaml /etc/netplan/
+> ```
+>
+> ```yaml
+> network:
+>   version: 2
+>   renderer: networkd
+>   ethernets:
+>     enp3s0:
+>       dhcp4: no
+>       addresses:
+>         - 10.10.10.2/24
+>       gateway4: 10.10.10.1
+>       nameservers:
+>           addresses: [10.10.10.1, 1.1.1.1]
+> 
+> ```
+
+
+
+
+
+## `ubuntu18`
+
+> 默认使用`netplan`管理网络,需要更改`netplan`配置使用`nmcli`管理网络
+
+## `ubuntu20`
+

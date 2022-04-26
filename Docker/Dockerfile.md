@@ -261,7 +261,32 @@ ADD ["<src>".. "<dest>"]
 -  如果<src>是**一个本地系统上的压缩格式的tar文件**，它将**被展开为一个目录**，其行为类似于"tar-x"命令；然而，**通过URL获取到的tar文件将不会自动展开**;
 -  如果<src>有多个，或其间接或直接使用了通配符，则<dest>必须是一个以/结尾的目录路径 ;如果<dest>不以/结尾，则其被视作一个普通文件，<src>的内容将被直接写入到<dest>;
 
- 
+> `ADD uam/ /opt/uam/` 这条指令的意思是将`Dockerfile`目录下的`uam`目录的内容复制到镜像目录`/opt/uam/`目录下
+
+```shell
+[root@localhost dockerfile]# tree
+.
+├── docker-entrypoint.sh
+├── Dockerfile
+├── uam
+│   ├── lib
+│   │   ├── libicudata.so.50
+│   │   ├── libicui18n.so.50
+│   │   ├── libicuuc.so.50
+│   │   ├── libpcre2-16.so.0
+│   │   ├── libpcre.so.1
+│   │   ├── libQt5Concurrent.so.5
+│   │   ├── libQt5Core.so.5
+│   │   ├── libQt5Network.so.5
+│   │   └── libstdc++.so.6
+│   └── uam
+└── v1
+    └── Dockerfile
+
+3 directories, 13 files
+```
+
+> 相当于将`uam`目录下的所有内容移动到镜像的`/opt/uam`下
 
 ### **5.4 示例**
 

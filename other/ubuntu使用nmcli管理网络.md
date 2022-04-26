@@ -77,3 +77,4 @@
 > Configuration accepted.
 > [root@root ~]# netplan apply
 > ```
+
