@@ -10,12 +10,14 @@
 [下载地址](https://github.com/Dreamacro/clash/releases)
 
 ### 安装`clash`
+
 > 如果无法在`Linux`上进行下载,下载到win再将其传入Linux
 ```shell
-gunzip clash-linux-amd64-v1.7.0.gz
-sudo mv clash-linux-amd64-v1.7.0 /usr/local/bin/clash
+gunzip clash-linux-amd64-*.gz  
+sudo mv clash-linux-amd64-* /usr/local/bin/clash
 sudo chmod +x /usr/local/bin/clash
 clash
+
 ```
 > 在执行最后一步后,clash会在`/root/.config`生成两个文件
 ```shell
@@ -24,7 +26,23 @@ clash
     ├── config.yaml
     └── Country.mmdb
 ```
+
+
+### 创建配置文件目录,并复制相关文件
+
+```shell
+mkdir /etc/clash
+cp /root/.config/clash/* /etc/clash/
+```
+
 ### 获取配置文件
+
+```shell
+wget https://openit.ml/Clash.yaml -O /etc/clash/config.yaml
+```
+
+> 这个文件是一个免费的翻墙网站提供的配置文件,想要进行相关修改,参照下面的配置文件说明
+
 > 在我翻墙的网址,复制订阅链接,在链接最后加上`&flag=clash`,就可以复制到相应的`yaml`文件,请求出来的文件应该是一行文件,在浏览器中按`F12`进入调试模式,会找到的`Network`,刷新,会有一个文件,我们的文件的内容的那个文件会有一个preview选项,其中就有格式化好的`yaml`文件
 
 
@@ -40,7 +58,10 @@ log-level: info
 external-controller: '0.0.0.0:9090'  # RESTful API端口,可以用来进行web管理
 ```
 
+
+
 ### 使用`systemd`管理`clash`
+
 ```shell
 cat >/usr/lib/systemd/system/clash.service<<EOF
 [Unit]
@@ -50,7 +71,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-ExecStart=/etc/clash/clash -d /etc/clash
+ExecStart=/usr/local/bin/clash -d /etc/clash/
 Restart=on-failure
 RestartSec=3s
 LimitNOFILE=999999
@@ -75,7 +96,10 @@ export http_proxy=127.0.0.1:7890
 export https_proxy=127.0.0.1:7890
 ```
 
-
 ## `web`页面管理`clash`
->  访问`http://clash.razord.top/#/proxies`
 
+>  访问`http://clash.razord.top/#/proxies`
+>
+>  如果之前登录过,需要修改clash的地址
+
+![image-20220427205656602](D:\markdown\other\Linux命令行安装clash,并翻墙.assets\image-20220427205656602.png)
