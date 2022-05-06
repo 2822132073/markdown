@@ -92,8 +92,9 @@ systemctl enable clash
 > 想在登录时就自动设置,就在`$HOME/.bash_profile`下将其添加进去
 
 ```shell
-export http_proxy=127.0.0.1:7890
-export https_proxy=127.0.0.1:7890
+IP=
+export http_proxy=$IP:7890
+export https_proxy=$IP:7890
 ```
 
 ## `web`页面管理`clash`
