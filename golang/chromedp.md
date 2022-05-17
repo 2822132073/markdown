@@ -19,6 +19,8 @@
 
 ### `func NewExecAllocator(parent context.Context, opts ...ExecAllocatorOption) (context.Context, context.CancelFunc)`
 
+> 注意,这些可以设置的Flag都是chrome的启动项设置参数,具体有很多[chrome启动参数](https://blog.csdn.net/qq_38776582/article/details/122426219),可以根据自己需要去设置
+>
 > 在这个函数中,可以对一些浏览器的启动参数选项进行设置,实际上chromedp调用的是`Chrome DevTools Protocol`的一些接口,从而对浏览器实现操作,例如:
 >
 > ```
@@ -31,6 +33,12 @@
 ### [chrome可设置的选项](https://developers.google.com/web/updates/2017/04/headless-chrome?hl=en)
 
 #### 同时进行开启三个窗口
+
+```go
+chromedp.Navigate("http://www.baidu.com") //中间的链接需要以http/https开头
+```
+
+
 
 ```
 root, cancel := chromedp.NewExecAllocator(context.Background(), chromedp.Flag("headless", false))

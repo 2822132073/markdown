@@ -202,8 +202,30 @@
 >
 > 
 
+## revert
 
-
+> 回退某个版本的修改
+>
+> [博客地址](https://blog.csdn.net/zhuqiuhui/article/details/105424776)
+>
+> 比如我们有dev1分支,dev2和master三条个分支,当一次dev1和master条分支合并后形成m5,发现dev1分支提交的内容有bug,需要紧急回退到原来的版本,但是在这之前,又有一个dev2分支的代码合并进master分支形成的m6,所以我们需要排除掉dev1分区的改变,保留dev2的改变,我们这个时候就需要revert	
+>
+> ![img](git.assets\watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3podXFpdWh1aQ==,size_16,color_FFFFFF,t_70.png)
+>
+> ```c
+> git revert  <commit_id> //将某个commit_id的修改回退,将其与的部分留在工作区和暂存区,并且形成一个新的commit
+> git revert -n <commit_id>   //只留在暂存区和工作区,但是不进行提交commit
+> ```
+>
+> 如果,想要回退的commit是一个merge产生的,那么它的父分支有两个,那么我们需要指定那个是想要保留的分支,不然无法进行**revert**,需要使用`-m`指定哪个是需要保留的分支内容,`-m`可以指定的值有两个(1|2),就按照下图,如果指定1,那就是保留**d7328d9**删除**ef8915c**产生的修改,选择2就是保留**ef8915c**,删除**d7328d9**的修改
+>
+> ![image-20220506220819834](D:\markdown\other\git.assets\image-20220506220819834.png)
+>
+> ```c
+> git revert -m[1|2] <commit_id>  //在需要回退的commit是merge形成的时候,或者commit有两个父分支,使用-m
+> ```
+>
+> 
 ## rebase
 
 >
