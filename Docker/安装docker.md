@@ -97,3 +97,21 @@ cat >/etc/docker/daemon.json <<EOF
 EOF
 ```
 
+
+
+
+
+
+
+
+
+```shell
+IP=215
+nmcli c mod ens192 ipv4.address 192.168.1.$IP/24
+nmcli c delete Wired\ connection\ 1 
+nmcli c delete ens224
+nmcli c add con-name ens224 ipv4.addresses 172.16.0.$IP/24 ipv4.method manual connection.autoconnect yes type ethernet ifname ens224
+```
+
+
+
