@@ -328,6 +328,19 @@ scp -rp /etc/kubernetes/pki/sa.* master-3:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/front-proxy-ca.* master-3:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/etcd/ca.* master-3:/etc/kubernetes/pki/etcd
 scp -rp /etc/kubernetes/admin.conf master-3:/etc/kubernetes
+
+
+scp -rp /etc/kubernetes/pki/ca.* node-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/sa.* node-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/etcd/ca.* node-2:/etc/kubernetes/pki/etcd
+scp -rp /etc/kubernetes/admin.conf node-2:/etc/kubernetes
+
+scp -rp /etc/kubernetes/pki/ca.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/sa.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/etcd/ca.* node-1:/etc/kubernetes/pki/etcd
+scp -rp /etc/kubernetes/admin.conf node-1:/etc/kubernetes
 ```
 
 #### 执行对应的引导命令
@@ -349,6 +362,8 @@ kubeadm join 192.168.91.8:6443 --token abcdef.0123456789abcdef \
 
 ## 安装calico
 
+> 我在安装的时候发现一个问题,在安装之后发现calico默认使用的是ipip模式,而在这个模式下,不知道为啥,pod可以访问pod,pod可以访问cluster,但是却无法访问Node,我将calico的网络模式换成了BGP模式,这样就可以了
+
 ```
 wget https://docs.projectcalico.org/v3.23/manifests/calico.yaml --no-check-certificate
 ```
@@ -359,6 +374,61 @@ kubectl apply -f calico.yaml
 
 > 不需要做任何修改就可以使用
 
+### 修改IPIP为BGP
+
+> 将原来的`ipipMode: Always`修改为`Never`
+
+```
+# kubectl edit ippool
+ipipMode: Always --> ipipMode: Never
+```
+
+
+
+## 安装Metric
+
+### 下载yaml
+
+```
+wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability.yaml
+```
+
+
+
+### 修改Yaml
+
+```
+sed -i "s#k8s.gcr.io/metrics-server#registry.cn-hangzhou.aliyuncs.com/chenby#g" high-availability.yaml
+args添加tls证书配置选项
+vim high-availability.yaml
+添加"- --kubelet-insecure-tls"
+```
+
+
+
+### 应用Yaml
+
+```
+kubectl apply -f high-availability.yaml
+```
+
+
+
+### 查看结果
+
+```
+查看metrics资源
+kubectl  get pod -n kube-system | grep metrics
+metrics-server-65fb95948b-2bcht            1/1     Running   0             32s
+metrics-server-65fb95948b-vqp5s            1/1     Running   0             32s
+查看node资源情况
+kubectl  top node
+NAME           CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   
+k8s-master01   127m         1%     2439Mi          64%       
+k8s-node01     50m          0%     1825Mi          23%       
+k8s-node02     53m          0%     1264Mi          16%   
+```
+
 
 
 ## 参考文档
@@ -366,3 +436,6 @@ kubectl apply -f calico.yaml
 [kubeadm + containerd 部署 k8s-v1.23.3(含证书升级)](https://blog.csdn.net/u010383467/article/details/122984097)
 
 [kubeadm部署K8S并使用containerd做运行时](https://blog.csdn.net/weixin_41020960/article/details/118108397)
+
+
+
