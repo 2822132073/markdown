@@ -161,7 +161,7 @@ ens34    94aea789-efb3-ef4c-81b0-e8b18ecc9797  ethernet  ens34
 > ```
 >
 > **删除IP`192.168.66.66`**
->
+> > 注意要加上`ipv4.method manual `，不然好像无法进行删除
 > ```shell
 > [root@docker ~]# nmcli c modify ens32  -ipv4.addresses 192.168.66.66/24 ipv4.method manual 
 > [root@docker ~]# nmcli c up ens32
