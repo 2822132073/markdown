@@ -154,6 +154,19 @@ curl -s https://install.zerotier.com | sudo bash
 ![image-20220426140222600](D:\markdown\other\zerotire.assets\image-20220426140222600.png)
 
 
+> 记得需要进行iptables的规则配置
+```
+PHY_IFACE=ens192; ZT_IFACE=ztbtovisvv
+sudo iptables -t nat -A POSTROUTING -o $PHY_IFACE -j MASQUERADE
+sudo iptables -A FORWARD -i $PHY_IFACE -o $ZT_IFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i $ZT_IFACE -o $PHY_IFACE -j ACCEPT
+```
+
+> 需要开启ipv4转发,将其临时生效之后,需要将`net.ipv4.ip_forward=1`添加进入`/etc/sysctl.conf`
+
+```
+sudo sysctl -w net.ipv4.ip_forward=1
+```
 
 
 
