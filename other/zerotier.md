@@ -145,9 +145,49 @@ curl -s https://install.zerotier.com | sudo bash
 
 [官网地址](https://zerotier.atlassian.net/wiki/spaces/SD/pages/224395274/Route+between+ZeroTier+and+Physical+Networks)
 
+### 在需要作为转发的机器上执行操作
+
+```
+sudo sysctl -w net.ipv4.ip_forward=1
+PHY_IFACE=eth0; ZT_IFACE=zt7nnig26
+sudo iptables -t nat -A POSTROUTING -o $PHY_IFACE -j MASQUERADE
+sudo iptables -A FORWARD -i $PHY_IFACE -o $ZT_IFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i $ZT_IFACE -o $PHY_IFACE -j ACCEPT
+```
+
+> `PHY_IFACE`:这个是指想要进行映射出去网络的那块网卡的名称
+>
+> `ZT_IFACE`:zerotier网卡的名称
+
+### 在需要进行访问的设备上添加路由
+
+> 这个每个操作系统都不相同,需要自己进行查询
+
+#### windowns
+
+```
+route add DEST_NETWORK mask SUBNET_MASK  GATEWAY [metric N] [if N] [-p]
+```
+
+> 大写为变量,中括号里面的是可选项
+>
+> `metirc`:指的是需要的代价,越小越优先
+>
+> `if`:指的是接口的编号,使用`route print`可以打印出来 
+
+#### Linux
+
+```
+ip route add DEST_NETWORK via GATEWAY dev INTERFACE_NAME
+```
+
 
 
 > 假设这个是路由器,内网地址为`10.0.0.0/24`,虚拟局域网的设备想要访问该内网,需要进行的步骤
+
+
+
+
 
 ![image-20220426135851986](D:\markdown\other\zerotire.assets\image-20220426135851986.png)
 
@@ -237,6 +277,8 @@ INFO - Adding new record 13.0.0.10.in-addr.arpa.: (esxi-win.home.)
 ```shell
 zerotier-cli set <NetworkID> allowDNS=1
 ```
+
+
 
 
 
