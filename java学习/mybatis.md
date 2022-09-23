@@ -151,11 +151,216 @@
 
 
 
+## 动态SQL
+
+### if
+
+[例子](http://m.biancheng.net/mybatis/if.html)
+
+```sql
+<if test="判断条件">
+    SQL语句
+</if>
+```
+
+> 一般条件是`type!=null`判断某个值是否为空
+
+```xml
+<select id="selectAllWebsite" resultMap="myResult">
+    select id,name,url from website
+    <if test="name != null">
+        where name like #{name}
+    </if>
+</select>
+```
+
+
+
+### choose (when, otherwise)
+
+[例子相关](http://m.biancheng.net/mybatis/choose-when-otherwise.html)
+
+```xml
+<choose>
+    <when test="判断条件1">
+        SQL语句1
+    </when >
+    <when test="判断条件2">
+        SQL语句2
+    </when >
+    <when test="判断条件3">
+        SQL语句3
+    </when >
+    <otherwise>
+        SQL语句4
+    </otherwise>
+</choose>
+```
+
+> 当`when`中某一个条件成立,就不会向下判断了,相当于`switch-case`,最后的`otherwise`相当于`switch-case`中的`default`
+
+```xml
+<select id="selectWebsite"
+        parameterType="net.biancheng.po.Website"
+        resultType="net.biancheng.po.Website">
+    SELECT id,name,url,age,country
+    FROM website WHERE 1=1
+    <choose>
+        <when test="name != null and name !=''">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </when>
+        <when test="url != null and url !=''">
+            AND url LIKE CONCAT('%',#{url},'%')
+        </when>
+        <otherwise>
+            AND age is not null
+        </otherwise>
+    </choose>
+</select>
+```
+
+
+
+### where
+
+> zai执行where语句,用到if标签时,需要在后面写到`where 1=1`,以免if标签一个条件都不成立的情况出现,那样的话就会报错,where标签会自动添加where关键字,并且自动识别`AND|OR`关键字,删除多余的关键字
+
+```xml
+<where>
+    <if test="判断条件">
+        AND/OR ...
+    </if>
+</where>
+```
+
+> 注意:必须要写`and|or`,where标签可以做到自动删除,无法做到自动删除
+
+```xml
+<select id="selectWebsite" resultType="net.biancheng.po.Website">
+    select id,name,url from website
+    <where>
+        <if test="name != null">
+            AND name like #{name}
+        </if>
+
+        <if test="url!= null">
+            AND url like #{url}
+        </if>
+    </where>
+</select>
+```
+
+
+
+### set
+
+> 相同的问题也会在update语句中出现,最后一个set后面不需要逗号,而哪一个是最后一个无法确定,所以有了set,
+>
+> set 标签可以为 SQL 语句动态的添加 set 关键字，剔除追加到条件末尾多余的逗号。
+
+```xml
+    <update id="updateStudentBySet" >
+        update student
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="chinese != null">chinese = #{chinese},</if>
+            <if test="english != null">english = #{english},</if>
+            <if test="math != null">math = #{math},</if>
+            <if test="class != null">class = #{class}</if>
+        </set>
+        where id=#{id};
+    </update>
+```
+
+> 注意,where条件需要写到最后,每个if标签里面的sql语句需要在末尾加上逗号
 
 
 
 
 
+### trim (where, set)
+
+```xml
+<trim prefix="前缀" suffix="后缀" prefixOverrides="忽略前缀字符" suffixOverrides="忽略后缀字符">
+    SQL语句
+</trim>
+```
+
+> `prefix`:固定在sql前面添加一段字符 
+>
+> `suffix`:固定在sql后面添加一段字符
+>
+>  `prefixOverrides`:指定开头有哪些字符,就忽略哪些字符,如果需要指定多个字符,使用`|`分隔开,例如:`and|or|AND|OR`
+>
+> `suffixOverrides`:指定后面有哪些字符,就忽略哪些字符
+
+```xml
+<select id="queryByStudentTrimWhere" resultMap="studentMap">
+    select *
+    from student
+    <trim prefixOverrides="AND|OR|and|or"  prefix="WHERE">
+        <if test="math!=null">AND math>#{math}</if>
+        <if test="english!=null">AND  english>#{english}</if>
+    </trim>
+</select>
+```
+
+> 实现where的功能
+
+```xml
+<update id="updateStudentByTrimSet">
+    update student
+    <trim prefix="set" suffixOverrides="," suffix="where id= #{id}">
+        <if test="name != null">name = #{name},</if>
+        <if test="chinese != null">chinese = #{chinese},</if>
+        <if test="english != null">english = #{english},</if>
+        <if test="math != null">math = #{math},</if>
+        <if test="class != null">class = #{class},</if>
+    </trim>
+</update>
+
+```
+
+> 实现set标签的功能
+
+### foreach
+
+> `collection`: 表示迭代集合的名称，可以使用`@Param`注解指定,如果传入的参数是一个pojo,它里面有一个List,可以直接指定这个List的属性名.
+> `item` :表示本次迭代获取的元素，若collection为List、Set或者数组，则表示其中的元素；若collection为map，则代表key-value的value，该参数为必选
+> `open` :表示该语句以什么开始，最常用的是左括弧’(’，注意:mybatis会将该字符拼接到整体的sql语句之前，并且只拼接一次，该参数为可选项
+> `close` :表示该语句以什么结束，最常用的是右括弧’)’，注意:mybatis会将该字符拼接到整体的sql语句之后，该参数为可选项
+> `separator`: mybatis会在每次迭代后给sql语句append上separator属性指定的字符，该参数为可选项
+> `index` :在list、Set和数组中,index表示当前迭代的位置，在map中，index代指是元素的key，该参数是可选项。
+
+```xml
+<insert id="addStudentByForeach">
+    insert into student (id, name, chinese, english, math, class)
+    <foreach collection="users" open="values" separator=","  item="item">
+        (#{item.id},#{item.name},#{item.chinese},#{item.english},#{item.math},#{item.class_t})
+    </foreach>
+
+</insert>
+```
+
+传入的对象
+
+```java
+public class Student {
+    private  Integer id;
+    private  String name;
+    private  Integer chinese;
+    private  Integer english;
+    private  Integer math;
+    private Integer class_t;
+}
+```
+
+接口
+
+```java
+int addStudentByForeach(@Param("users") List<Student> list);
+
+```
 
 ### [Mybatis注解开发相关](https://blog.csdn.net/weixin_43883917/article/details/113830667)
 
