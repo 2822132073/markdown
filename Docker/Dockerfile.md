@@ -537,7 +537,7 @@ ENV <key>=<value> . .
 
 （1）编写dockerfile文件
 
-```
+```dockerfile
 # Description: test image
 FROM busybox:latest
 MAINTAINER "Along <along@along.com>"
