@@ -548,7 +548,7 @@ public class Client2 {
 [SpringAop切入点execution表达式详解](https://blog.csdn.net/thinkingcao/article/details/84872610)
 
 >  ```java
->  execution (* com.sample.service.impl..*.*(..))
+>  execution (* com.sample.service.impl.*.*(..))
 >  ```
 >
 > 1、execution()：表达式主体。
@@ -721,7 +721,6 @@ public class custom {
             <aop:after method="after" pointcut-ref="userServicePointCut"/>
         </aop:aspect>
     </aop:config>
-
 </beans>
 
 ```
@@ -761,3 +760,256 @@ public class Annotation {
 }
 ```
 
+
+
+
+
+## 整合Mybatis
+
+> 之前是通过对象创建`Sqlsession`,在Spring中需要全部使用bean实现
+>
+> 之前是通过 `SqlSessionFactoryBuilder`->`sqlSessionFactory`-->`SqlSession`,而`SqlSessionFactoryBuilder`必要的一个属性就是数据库的相关的信息
+>
+> 现在是通过`dataSource`-->`SqlSessionFactoryBean`-->`SqlSessionTemplate`
+>
+> `SqlSessionTemplate`是`SqlSession`的一个实现
+
+![image-20220924160137550](https://cdn.jsdelivr.net/gh/2822132073/image/202209241601793.png)
+
+
+
+### SqlSessionTemplate
+
+#### beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/util
+       https://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+    使用这个导入properties配置文件需要导入
+    xmlns:context="http://www.springframework.org/schema/context"
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+
+    在引入properties文件时,需要加入system-properties-mode="NEVER",不然在引用username时,会引入系统的username的变量
+    加载properties文件博客: https://blog.csdn.net/qq_57907966/article/details/125831680
+    -->
+    <context:property-placeholder  location="classpath:db.properties" system-properties-mode="NEVER"/>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" >
+        <!--这个是指定mybatis配置文件的位置,其实大多数的配置文件都可以在这里进行配置,也可以在配置文件里面进行配置-->
+        <property name="configLocation" value="mybatis-config.xml"/>
+        <!--指定mapper文件的位置-->
+        <property name="mapperLocations" value="mapper/*.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--SqlSessionTemplate没有Set方法,所以不能使用有参构造,只能使用constructor-arg-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!--通过一个类来实现StudentMapper,然后将这个类注册到Spring中,使用Spring接管,在这个类中完成SqlSession的创建和一些相关的处理-->
+    <bean id="studentMapper" class="com.fsl.dao.StudentMapperImpl">
+        <property name="sqlSession" ref="sqlSession"/>
+    </bean>
+</beans>
+
+```
+
+#### StudentMapperImpl.java
+
+```java
+public class StudentMapperImpl implements StudentMapper{
+
+
+    public SqlSession sqlSession;
+    // 这个实现类必须要有sqlSession的set方法,因为sqlSession需要在Spring中去注入
+    public void setSqlSession(SqlSessionTemplate sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+
+    @Override
+    //直接在这里调用类里面的sqlSession去调用getMapper获取对应的接口
+    public List<Student> getAllStudent() {
+        StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
+        return mapper.getAllStudent();
+    }
+}
+```
+
+#### 测试代码
+
+```java
+@Test
+public void test(){
+    ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+    StudentMapper studentMapper = context.getBean("studentMapper", StudentMapper.class);
+    for (Student student : studentMapper.getAllStudent()) {
+        System.out.println(student);
+    }
+}
+```
+
+
+
+
+
+
+
+### SqlSessionDaoSupport
+
+> 上面的那种方法还需要从`SqlSessionFactory`中获取`SqlSessionTemplate`,使用`SqlSessionDaoSupport`,就不需要使用`SqlSessionTemplate`,它可以直接获取
+
+
+
+#### studentMapperImpl
+
+> 直接继承`SqlSessionDaoSupport`,可以直接调用`getSqlSession`方法获取,只需要传入一个`sqlSessionFactory`,就可以了
+
+```java
+public class StudentMapperImpl2 extends SqlSessionDaoSupport implements StudentMapper{
+    @Override
+    public List<Student> getAllStudent() {
+        StudentMapper mapper = getSqlSession().getMapper(StudentMapper.class);
+        return mapper.getAllStudent();
+    }
+}
+```
+
+
+
+#### beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/util
+       https://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+    使用这个导入properties配置文件需要导入
+    xmlns:context="http://www.springframework.org/schema/context"
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+
+    在引入properties文件时,需要加入system-properties-mode="NEVER",不然在引用username时,会引入系统的username的变量
+    加载properties文件博客: https://blog.csdn.net/qq_57907966/article/details/125831680
+    -->
+    <context:property-placeholder  location="classpath:db.properties" system-properties-mode="NEVER"/>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" >
+        <!--这个是指定mybatis配置文件的位置,其实大多数的配置文件都可以在这里进行配置,也可以在配置文件里面进行配置-->
+        <property name="configLocation" value="mybatis-config.xml"/>
+        <!--指定mapper文件的位置-->
+        <property name="mapperLocations" value="mapper/*.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+	<!--只传入一个sqlSessionFactory-->
+    <bean id="studentMapper2" class="com.fsl.dao.StudentMapperImpl2">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+</beans>
+
+```
+
+#### 测试代码
+
+```java
+@Test
+public void SqlSessionSupportTest(){
+    ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+    StudentMapper studentMapper = context.getBean("studentMapper2", StudentMapper.class);
+    for (Student student : studentMapper.getAllStudent()) {
+        System.out.println(student);
+    }
+}
+```
+
+
+
+### 总结
+
+其实可以看到,两次的测试代码都没什么变化,几乎将所有的对象的创建工作都交给了Spring,我们只需要去
+
+## 事务相关
+
+> 数据库支持事务是必须的,下面使用aop的方式进行事务的配置
+
+### 依赖
+
+![image-20220925003514433](https://cdn.jsdelivr.net/gh/2822132073/image/202209250035080.png)
+
+
+
+### xml约束
+
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/tx
+       https://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd">
+```
+
+
+
+### 配置事务Advice
+
+```xml
+
+<!--配置事务通知-->
+<tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+        <!--配置哪些方法使用什么样的事务,配置事务的传播特性  这里的*代表所有方法-->
+        <tx:method name="*" propagation="REQUIRED"/>
+    </tx:attributes>
+</tx:advice>
+```
+
+> 事务的传播特性一般就是使用默认的**REQUIRED**,相关的特性可以在网上查找相关的博客
+
+### 配置哪些方法支持事务
+
+```xml
+    <aop:config>
+        <aop:pointcut id="studentPointcut" expression="execution(* com.fsl.*.*.*(..))"/>
+        <aop:advisor pointcut-ref="studentPointcut" advice-ref="txAdvice"/>
+    </aop:config>
+```
+
+> 这里就是传统的**aop**的配置方法,这样配置,一个方法就是一个事务,具有原子性
+>
+> 记住,它会在每个方法开启一个事务,在方法的结尾关闭事务
