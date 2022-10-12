@@ -15,7 +15,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 </beans>
-
 ```
 
 
@@ -361,7 +360,6 @@ xmlns:context="http://www.springframework.org/schema/context"
 
 ```java
 @Autowired(required = false)
-
 ```
 
 > 在使用**Autowired**时,如果**bean**不存在,就会报错,要是想要不报错,就加上`(required = false)`
@@ -426,6 +424,8 @@ Resource与Autowired区别
 
 
 ### @Value
+
+> 指定name中bean中的值
 
 ```java
 @Value(value = "fsl")
