@@ -4,9 +4,27 @@
 
 > nmcli用来配置网络,可以永久的修改,并且生成配置文件
 
-![img](D:\markdown\nmcli.assets\1482552-20180930195218267-1123602572.png)
-
 > nmcli有最重要的是device和connection,一个device可以有许多的connection,但是同一时刻只能有一个connection处于up状态
+
+
+
+```bash
+nmcli connection modify netplan-ens33  ipv4.method manual ipv4.dns 223.5.5.5 ipv4.gateway 10.0.0.12 ipv4.addresses 10.0.0.111/24 connection.autoconnect yes 
+```
+
+> `ipv4.method`: 设置为`manual`,相当于设置为`static`
+>
+> `ipv4.dns`:设置`dns`
+>
+> `ipv4.gateway `:设置网关
+>
+> `ipv4.addresses`:设置`ipv4`地址和掩码
+>
+> `connection.autoconnect`: 相当于之前的`ONBOOT`
+
+
+
+
 
 ## 使用`nmcli`初始化设备
 

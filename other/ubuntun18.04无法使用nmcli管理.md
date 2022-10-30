@@ -14,15 +14,14 @@
 
 > 在这个文件下加入一行`renderer: NetworkManager`,注意缩进
 
-```shell
+> 注意,这个文件只能有一下内容,不然`NetworManager`不生效
+
+```yaml
 [root@root ~]# cat /etc/netplan/00-installer-config.yaml 
 # This is the network config written by 'subiquity'
 network:
   renderer: NetworkManager
   version: 2
-  ethernets:
-    ens33:
-      dhcp4: true
 ```
 
 ```shell
