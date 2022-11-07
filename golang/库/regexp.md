@@ -15,7 +15,7 @@ func main() {
 
 ```
 
-![image-20211230174329751](D:\markdown\golang\Untitled.assets\image-20211230174329751.png)
+![image-20211230174329751](https://cdn.jsdelivr.net/gh/2822132073/image/202211071225027.png)
 
 > 我们可以根据`SubexpNames()`得出得数组得出，在`FindAllStringSubmatch()`返回得结果集中对应位置的命名组的名称,如果没有使用`(?<name>expr)`语法,那么在`SubexpNames()`中也不会有这个命名组,就上图来说`groupNames[1]`对应的就是`i[0][1]`的内容
 

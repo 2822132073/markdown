@@ -38,7 +38,7 @@ as select_statement
 参数说明：
 （1）algorithm:可选项，表示视图选择的算法。
 （2）view_name:表示要创建的视图名称。
-（3）column_list:可选项，指定视图中各个属性的名词，默认情况下与SELECT语句中的查询的属性相同。
+（3）column_list:可选项，指定视图中各个属性的名词，默认情况下与SELECT语句中的查询的属性相同,column_list中的名称数目必须等于SELECT语句检索的列数
 （4）select_statement:表示一个完整的查询语句，将查询记录导入视图中。
 （5）[with [cascaded | local] check option]：可选项，表示更新视图时要保证在该视图的权限范围之内。
 

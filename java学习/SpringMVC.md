@@ -220,7 +220,7 @@ public class TestController02 {
 
 ```
 
-
+> 这里使用的`@RequestParam`相当于把url中参数为list映射到方法中的list上
 
 
 
@@ -435,7 +435,41 @@ public class TestController05 {
 >
 > 在这种情况下,使用`.`的形式访问类的下级元素进行传入参数,与传入对象相同,字段的名称必须相同
 
+## 对数组的处理
 
+> 想要映射为数组,url的参数为必须要和数组的名字相同,例如这里的想要传入的数字的变量名为`list`,
+>
+> `http://localhost:8080/array?list=admin&list=root&list=asdasd&list=xiaoming`
+
+```java
+package com.fsl.controller;
+
+
+import com.fsl.pojo.User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+@Controller
+public class TestController05 {
+    @RequestMapping("/array")
+    public String arr(@RequestParam List<String> list, Model model){
+        System.out.println(list);
+        model.addAttribute("msg",list);
+        return "test";
+    }
+}
+
+```
+
+> `http://localhost:8080/array?list=admin&list=root&list=asdasd&list=xiaoming`,输出为
+>
+> ```
+> [admin, root, asdasd, xiaoming]
+> ```
 
 # 乱码问题的处理
 
