@@ -27,7 +27,7 @@
 > 
 > 1. overrides
 > 2. flags
-> 3. env. variables
+> 3. env.variables
 > 4. config file
 > 5. key/value store
 > 6. defaults

@@ -471,6 +471,46 @@ public class TestController05 {
 > [admin, root, asdasd, xiaoming]
 > ```
 
+
+
+
+
+# 返回Json数据
+
+## 依赖
+
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.9.8</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.9.8</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-annotations</artifactId>
+    <version>2.9.8</version>
+</dependency>
+```
+
+> 将这些依赖导入,还需要将包添加到`Project Structure`的`Artifacts`的`WEB-INF\lib`下
+
+## 代码
+
+```java
+    @RequestMapping("/getuser")
+    @ResponseBody
+    public User getUser(){
+        return new User(1,13,"fsl");
+    }
+```
+
+> 导入这些包后,只需要直接返回对象,java就可以直接将对象转换成Json对象
+
 # 乱码问题的处理
 
 > 主要是对web.xml中添加一些一些配置
