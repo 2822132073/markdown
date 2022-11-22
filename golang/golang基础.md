@@ -1224,6 +1224,63 @@ func main() {
 
 > ​	`value, ok := sliceMap[key]`,要是map里面有元素返回对应的元素和true,不然就返回nil和false
 
+## 函数的定义
+
+### 返回值
+
+#### 有一个返回值
+
+```go
+func sum(a, b int) (ret int) {
+	ret = a + b
+	return ret
+}
+
+func sum2(a, b int) (int) {
+	ret := a + b
+	return ret
+}
+
+func sum3(a int, b int) int {
+    # 当返回多个参数时，必须携带()
+	return a + b
+}
+```
+
+#### 多个返回值，且在return中指定返回的内容
+
+```csharp
+func return_one() (name string, age int) {
+	name = "tom"
+	age = 20
+	return name, age
+}
+```
+
+#### 多个返回值，返回值名称没有被使用
+
+```csharp
+func return_two() (name string, age int) {
+	name = "tom"
+	age = 20
+	return // 等价于 return name, age
+}
+```
+
+#### return覆盖命名返回值，返回值名称没有被使用
+
+```go
+func return_cover() (name string, age int) {
+	n := "你好"
+	a := 20
+	return n, a
+}
+```
+
+
+
+
+
 ## 方法定义
 
 
