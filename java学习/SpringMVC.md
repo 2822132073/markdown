@@ -544,69 +544,364 @@ public class TestController05 {
 
 # 整合SSM
 
+> 记得将依赖添加进入WEB-INF中的lib中
+>
+> ![image-20221125202857380](https://cdn.jsdelivr.net/gh/2822132073/image/202211252028670.png)
+
 ## 依赖
 
 ```xml
-<dependencies>
-   <!--Junit-->
-   <dependency>
-       <groupId>junit</groupId>
-       <artifactId>junit</artifactId>
-       <version>4.12</version>
-   </dependency>
-   <!--数据库驱动-->
-   <dependency>
-       <groupId>mysql</groupId>
-       <artifactId>mysql-connector-java</artifactId>
-       <version>5.1.47</version>
-   </dependency>
-   <!-- 数据库连接池 -->
-   <dependency>
-       <groupId>com.mchange</groupId>
-       <artifactId>c3p0</artifactId>
-       <version>0.9.5.2</version>
-   </dependency>
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+        </dependency>
 
-   <!--Servlet - JSP -->
-   <dependency>
-       <groupId>javax.servlet</groupId>
-       <artifactId>servlet-api</artifactId>
-       <version>2.5</version>
-   </dependency>
-   <dependency>
-       <groupId>javax.servlet.jsp</groupId>
-       <artifactId>jsp-api</artifactId>
-       <version>2.2</version>
-   </dependency>
-   <dependency>
-       <groupId>javax.servlet</groupId>
-       <artifactId>jstl</artifactId>
-       <version>1.2</version>
-   </dependency>
+        <!--mybatis-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.10</version>
+        </dependency>
+        <!--mysql-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.30</version>
+        </dependency>
+        <!--junit-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <!--log4j-->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <!-- 数据库连接池 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        <!--Servlet - JSP -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <!--Spring-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.1.9.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.1.9.RELEASE</version>
+        </dependency>
+        <!--json相关配置-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+```
 
-   <!--Mybatis-->
-   <dependency>
-       <groupId>org.mybatis</groupId>
-       <artifactId>mybatis</artifactId>
-       <version>3.5.2</version>
-   </dependency>
-   <dependency>
-       <groupId>org.mybatis</groupId>
-       <artifactId>mybatis-spring</artifactId>
-       <version>2.0.2</version>
-   </dependency>
+## 搭建Mybatis环境
 
-   <!--Spring-->
-   <dependency>
-       <groupId>org.springframework</groupId>
-       <artifactId>spring-webmvc</artifactId>
-       <version>5.1.9.RELEASE</version>
-   </dependency>
-   <dependency>
-       <groupId>org.springframework</groupId>
-       <artifactId>spring-jdbc</artifactId>
-       <version>5.1.9.RELEASE</version>
-   </dependency>
-</dependencies>
+![image-20221125155815583](https://cdn.jsdelivr.net/gh/2822132073/image/202211251558616.png)
+
+> 主要的组成部分有
+>
+> - **Mybatis-config.xml**:对应的mybatis配置文件
+> - **MybatisUtils**:工具类
+> - **db.properties**:数据库配置文件
+> - **log4j.properties**:日志配置文件
+> - 对应的Mapper接口
+> - 对应的mapper的Xml文件
+
+### Mybatis-config.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="db.properties"/>
+    <settings>
+        <setting name="logImpl" value="LOG4J"/>
+        <setting name="mapUnderscoreToCamelCase" value="false"/>
+        <setting name="autoMappingBehavior" value="PARTIAL"/>
+    </settings>
+    <typeAliases>
+        <package name="com.fsl"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${username}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="mapper/StudentMapper.xml"/>
+    </mappers>
+</configuration>
+```
+
+### MybatisUtils
+
+```java
+package com.fsl.utils;
+
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+public class MybatisUtils {
+    public static SqlSessionFactory sqlSessionFactory;
+    static {
+        try {
+            String configFile = "mybatis-config.xml";
+            InputStream inputStream = Resources.getResourceAsStream(configFile);
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+    public static SqlSession getSqlSession(){
+        return sqlSessionFactory.openSession();
+    }
+}
+```
+
+### db.properties
+
+```properties
+driver=com.mysql.cj.jdbc.Driver
+url=jdbc:mysql://host:port/database?useUnicode=true&characterEncoding=UTF-8
+username=root
+password=password
+```
+
+### log4j.properties
+
+```properties
+log4j.rootLogger = DEBUG,Console
+log4j.logger.Mapper=DEBUG
+log4j.appender.Console=org.apache.log4j.ConsoleAppender
+log4j.appender.Console.Target=System.out
+log4j.appender.Console.layout=org.apache.log4j.PatternLayout
+log4j.appender.Console.layout.ConversionPattern=%5p  - %m%n
+log4j.logger.java.sql.ResultSet=INFO
+log4j.logger.org.apache=INFO
+```
+
+## 设置serverlet和过滤器
+
+### web.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <!--指定spring配置文件的位置,在这个文件中导入其他的spring配置-->
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <session-config>
+        <session-timeout>15</session-timeout>
+    </session-config>
+</web-app>
+```
+
+## 配置spring
+
+![image-20221125164201902](https://cdn.jsdelivr.net/gh/2822132073/image/202211251642346.png)
+
+> 主要是:
+>
+> - **spring-dao.xml**: 对mybatis进行相关配置
+> - **spring-mvc.xml**:对mvc进行相关的配置
+> - **spring-service.xml**:
+
+### spring-dao.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--配置数据配置文件的位置-->
+    <context:property-placeholder location="classpath:db.properties" system-properties-mode="NEVER"/>
+    <!--指定Mapper接口的位置-->
+    <context:component-scan base-package="com.fsl.dao"/>
+    <!--配置数据源-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+        <property name="driverClassName" value="${driver}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+        <property name="url" value="${url}"/>
+    </bean>
+    <!--配置SqlSessionFactoryBean,这个将会被下面的MapperScannerConfigurer扫描-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--配置mybatis配置文件的位置-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置mapper文件的位置,这里注释了,但是在mybatis-config.xml中进行了配置-->
+        <!--<property name="mapperLocations" value="mapper/*.xml"/>-->
+    </bean>
+    
+    <!--MapperScannerConfigurer可以自动扫描basePackage指定的包,将其中的接口全部注册到Spring中,不需要以前一样一个一个的注册-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描Dao接口包 -->
+        <property name="basePackage" value="com.fsl.dao"/>
+    </bean>
+</beans>
+```
+
+### spring-mvc
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--配置使用注解驱动,这个配置的意思就是使注解生效-->
+    <mvc:annotation-driven/>
+    <!-- 静态资源默认servlet配置-->
+    <mvc:default-servlet-handler/>
+    <!--配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--扫描controller-->
+    <context:component-scan base-package="com.fsl.controller"/>
+</beans>
+```
+
+### spring-service.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--扫描service包-->
+    <context:component-scan base-package="com.fsl.service"/>
+	<!--将serviceImp都注册都其中来-->
+    <bean id="studentServiceImpl" class="com.fsl.service.StudentServiceImpl">
+        <property name="studentMapper" ref="studentMapper"/>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>
+```
+
+### applicationContext.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <import resource="spring-dao.xml"/>
+    <import resource="spring-service.xml"/>
+    <import resource="spring-mvc.xml"/>
+</beans>
 ```
 

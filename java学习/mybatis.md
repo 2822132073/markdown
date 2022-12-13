@@ -1,5 +1,26 @@
 ## 相关配置文件
 
+
+
+### maven依赖
+
+```xml
+        <!--mybatis-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.10</version>
+        </dependency>
+        <!--mysql-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.30</version>
+        </dependency>
+```
+
+
+
 ### mybatis-config.xml
 
 ```xml
@@ -39,6 +60,37 @@
 > `typeAliases`:其中的package指的是包的位置,它会将指定位置的所有的内容进行导入,并设置别名,例如:`com.fsl.pojo.User`那么它的别名是`user`
 
 > `mybatis-config.xml`文件的配置是有顺序properties,settings,typeAliases,typeHandlers,objectFactory,objectWrapperFactory,reflectorFactory,plugins,environments,databaseIdProvider,mappers
+
+### MybatisUtils
+
+```java
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+public class MybatisUtils {
+    public static SqlSessionFactory sqlSessionFactory;
+    static {
+        try {
+            String configFile = "mybatis-config.xml";
+            InputStream inputStream = Resources.getResourceAsStream(configFile);
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+    public static SqlSession getSqlSession(){
+        return sqlSessionFactory.openSession();
+    }
+}
+
+```
 
 
 
