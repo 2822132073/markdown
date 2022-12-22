@@ -371,7 +371,6 @@ xmlns:context="http://www.springframework.org/schema/context"
 ```java
 @Autowired
 @Qualifier(value = "dog")
-// 
 ```
 
 #### @Resource
@@ -450,9 +449,9 @@ private String name;
 
 为了更好的进行分层，Spring可以使用其它三个注解，功能一样，目前使用哪一个功能都一样。
 
-1. @Controller：web层
-2. @Service：service层
-3. @Repository：dao层
+1. **@Controller**：web层
+2. **@Service**：service层
+3. **@Repository**：dao层
 
 ## 全Java配置Bean
 
