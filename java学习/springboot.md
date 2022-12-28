@@ -695,3 +695,253 @@ public class HelloController {
 </mapper>
 ```
 
+
+
+
+
+# Mybatis-plus
+
+## [官网](https://baomidou.com/pages/24112f/)
+
+```shel
+D:.
+│   mybatis-demo.iml
+│   pom.xml
+│
+├───src
+│   ├───main
+│   │   ├───java
+│   │   │   └───com
+│   │   │       └───fsl
+│   │   │           │   MybatisDemoApplication.java
+│   │   │           │
+│   │   │           ├───mapper
+│   │   │           │       ClaMapper.java
+│   │   │           │       StudentMapper.java
+│   │   │           │
+│   │   │           └───pojo
+│   │   │                   Cla.java
+│   │   │                   Student.java
+│   │   │
+│   │   └───resources
+│   │           application.yaml
+│   │
+│   └───test
+│       └───java
+│           └───com
+│               └───fsl
+│                       MybatisDemoApplicationTests.java
+
+
+```
+
+
+
+## 依赖
+
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus-boot-starter</artifactId>
+    <version>3.4.3.1</version>
+</dependency>
+```
+
+## 配置
+
+**application.yaml**
+
+> 和普通的mybatis配置没有区别
+
+```yaml
+spring:
+  datasource:
+    username: root
+    password: FengSiLin12345.
+    url: jdbc:mysql://gz-cynosdbmysql-grp-56yht59x.sql.tencentcdb.com:21754/task_11_25
+    driver-class-name: com.mysql.cj.jdbc.Driver
+```
+
+## 使用
+
+> mybatis-plus可以几乎完成所有单表操作,不需要写xml文件,但是对于联表操作,还是需要写xml
+
+### 单表操作
+
+**sql文件**
+
+> 表结构
+
+```sql
+create table student
+(
+    id    int auto_increment primary key,
+    name  varchar(10)            not null,
+    sex   enum ('男', '女')      not null,
+    age   int                    not null,
+    major varchar(20) default '' null,
+    grade int                    not null,
+    claid int(10)                not null,
+    constraint id unique (id),
+    constraint class_fk foreign key (claid) references cla (id)
+        on update cascade on delete cascade
+);
+
+
+create table cla
+(
+    id   int auto_increment primary key,
+    name varchar(10) not null,
+    constraint id unique (id)
+);
+```
+
+#### 第一步:创建对应的pojo类
+
+**Student.java**
+
+```java
+package com.fsl.pojo;
+
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Student {
+    private Integer id;
+    private String name;
+    private String sex;
+    private Integer age;
+    private String major;
+    private Integer grade;
+    private Integer claid;
+}
+
+```
+
+**Cla.java**
+
+```java
+package com.fsl.pojo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Cla {
+    private Integer id;
+    private String name;
+}
+
+```
+
+#### 第二步: 创建对应的Mapper接口
+
+> 只需要创建完成对应的接口,并且继承`BaseMapper<T>`,就可以进行单表操作,这里的T就是需要操作的实体类
+
+**StudentMapper.java**
+
+```java
+package com.fsl.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.fsl.pojo.Student;
+import org.springframework.stereotype.Repository;
+
+
+@Repository
+public interface StudentMapper extends BaseMapper<Student> {
+}
+
+```
+
+#### 第三步: 在启动类上加上注释@MapperScan
+
+> 需要指定Mapper的位置
+
+```java
+package com.fsl;
+
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+
+@MapperScan("com.fsl.mapper")
+@SpringBootApplication
+public class MybatisDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MybatisDemoApplication.class, args);
+    }
+
+}
+
+```
+
+
+
+#### 第四步: 测试
+
+```java
+package com.fsl;
+
+import com.fsl.mapper.StudentMapper;
+import com.fsl.pojo.Student;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+@SpringBootTest
+class MybatisDemoApplicationTests {
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+    @Test
+    void mybatisplusTest(){
+        List<Student> list = studentMapper.selectList(null);
+        for (Student student : list) {
+            System.out.println(student);
+        }
+    }
+}
+
+```
+
+### 联表操作
+
+> 这个的用法和之前写mybatis一样,需要xml文件
+
+### 注释
+
+#### @TableName
+
+> 用在pojo类上,指定该类对应的是哪张表
+
+#### @TableId
+
+> 用在属性上,指定数据库的表对应哪个属性
+
+#### @TableField
+
+> 用在pojo类的属性上,指定对应的是哪个字段,在属性在数据库表中不存在时,可以将其设置为`exeist = false`
+
