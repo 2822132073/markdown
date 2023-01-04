@@ -6,10 +6,10 @@
 
 > nmcli有最重要的是device和connection,一个device可以有许多的connection,但是同一时刻只能有一个connection处于up状态
 
-
+> `802-3-ethernet.mac-address`:在克隆虚拟机之后,网卡地址不同可能导致出现报错,可以事先将其设置为空,这样就不会出现问题了
 
 ```bash
-nmcli connection modify netplan-ens33  ipv4.method manual ipv4.dns 223.5.5.5 ipv4.gateway 10.0.0.12 ipv4.addresses 10.0.0.111/24 connection.autoconnect yes 
+nmcli connection modify netplan-ens33  ipv4.method manual ipv4.dns 223.5.5.5 ipv4.gateway 10.0.0.12 ipv4.addresses 10.0.0.111/24 connection.autoconnect yes ipv6.method ignore 802-3-ethernet.mac-address ""
 ```
 
 > `ipv4.method`: 设置为`manual`,相当于设置为`static`
@@ -21,6 +21,8 @@ nmcli connection modify netplan-ens33  ipv4.method manual ipv4.dns 223.5.5.5 ipv
 > `ipv4.addresses`:设置`ipv4`地址和掩码
 >
 > `connection.autoconnect`: 相当于之前的`ONBOOT`
+>
+> `ipv6.method`:关闭`ipv6`
 
 
 

@@ -13,15 +13,20 @@ systemctl stop firewalld
 
 ### 关闭selinux
 
+> ubuntu18 需要安装`selinux-utils`
+>
+> ```shell
+> apt install  -y selinux-utils
+> ```
+
 ```shell
 setenforce 0
 sed -i '/SELINUX/s/enforcing/disabled/g' /etc/selinux/config
-
 ```
 
 ### 节点都要关闭swap
 
-```shel
+```shell
 swapoff -a
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 ```
@@ -40,6 +45,17 @@ modprobe overlay
 ```
 
 #### 开启模块自动加载服务
+
+
+
+> Linux系统加载哪些内核模块，和配置文件有关系。
+>
+> 1. 模块保存在`/lib/modules/`下。
+> 2. 使用`/etc/modules-load.d/`来配置系统启动时加载哪些模块。
+> 3. 使用`/etc/modprobe.d/`下配置模块加载时的一些参数
+
+
+> 这一步会在ubuntu中出现警告,但是不影响使用,仍然会开启自启
 
 ```
 cat > /etc/modules-load.d/k8s-modules.conf <<EOF
@@ -61,7 +77,7 @@ systemctl restart systemd-modules-load
 
 ### 内核优化
 
-```
+```bash
 cat <<EOF > /etc/sysctl.d/kubernetes.conf
 # 开启数据包转发功能（实现vxlan）
 net.ipv4.ip_forward=1
@@ -92,13 +108,13 @@ EOF
 
 配置生效
 
-```
+```bash
 sysctl -p /etc/sysctl.d/kubernetes.conf
 ```
 
 ### 清空iptables规则
 
-```
+```bash
 iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat
 iptables -P FORWARD ACCEPT
 ```
@@ -107,7 +123,7 @@ iptables -P FORWARD ACCEPT
 
 ### 配置docker源
 
-```
+```bash
 wget -O /etc/yum.repos.d/docker.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 ```
 
@@ -115,7 +131,7 @@ wget -O /etc/yum.repos.d/docker.repo http://mirrors.aliyun.com/docker-ce/linux/c
 
 
 
-```
+```bash
 yum install -y containerd.io
 ```
 
@@ -136,11 +152,60 @@ containerd config default >/etc/containerd/config.toml
 #### 对其进行相应的修改
 
 ```shell
-sed -i "s#k8s.gcr.io#registry.cn-hangzhou.aliyuncs.com/google_containers#g"  /etc/containerd/config.toml
-sed -i "s#.*SystemdCgroup.*##g" /etc/containerd/config.toml
-sed -i '/containerd.runtimes.runc.options/a\ \ \ \ \ \ \ \ \ \ \ \ SystemdCgroup = true' /etc/containerd/config.toml
-sed -i "s#https://registry-1.docker.io#https://registry.cn-hangzhou.aliyuncs.com#g"  /etc/containerd/config.toml
+# 修改Containerd的配置文件
+sed -i "s#SystemdCgroup\ \=\ false#SystemdCgroup\ \=\ true#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep SystemdCgroup
+
+sed -i "s#registry.k8s.io#registry.cn-hangzhou.aliyuncs.com/chenby#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep sandbox_image
+
+sed -i "s#config_path\ \=\ \"\"#config_path\ \=\ \"/etc/containerd/certs.d\"#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep certs.d
+
+mkdir /etc/containerd/certs.d/docker.io -pv
+
+cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
+server = "https://docker.io"
+[host."https://hub-mirror.c.163.com"]
+  capabilities = ["pull", "resolve"]
+EOF
 ```
+
+#### **配置镜像加速**
+
+```shell
+cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
+server = "https://docker.io"
+[host."https://hub-mirror.c.163.com"]
+  capabilities = ["pull", "resolve"]
+EOF
+## 重启生效加速
+systemctl daemon-reload
+systemctl enable --now containerd
+systemctl restart containerd
+```
+
+#### 配置crictl的containerd的socket位置
+
+```bash
+cat > /etc/crictl.yaml <<'EOF'
+runtime-endpoint: "unix:///run/containerd/containerd.sock"
+image-endpoint: "unix:///run/containerd/containerd.sock"
+timeout: 0
+debug: false
+pull-image-on-create: false
+disable-pull-on-run: false
+EOF
+ 
+ 
+# 或者执行下面的两条命令来生成配置文件
+crictl config runtime-endpoint unix:///run/containerd/containerd.sock
+crictl config image-endpoint unix:///run/containerd/containerd.sock
+```
+
+
+
+
 
 ### 启动 containerd 服务，**并设置为开机启动**
 
@@ -151,7 +216,30 @@ systemctl restart containerd
 
 ## 安装kubeadm,kubelet
 
+### ubuntu18.04
+
+[阿里云](https://developer.aliyun.com/mirror/kubernetes/?spm=a2c6h.25603864.0.0.71132529B0RUxM)
+
+```bash
+apt-get update && apt-get install -y apt-transport-https
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+EOF
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
 ```
+
+```shell
+sudo apt-cache madison package #使用 apt-cache madison 列出软件的所有来源
+sudo apt-get install package=version #通过apt-get安装指定版本的软件
+```
+
+
+
+### Centos7
+
+```bash
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
@@ -170,23 +258,24 @@ EOF
 yum list kubeadm kubelet
 ```
 
-### 安装
+#### 安装
 
 ```
 yum install -y kubelet kubeadm
 ```
 
-### 配置命令补齐
+#### 配置命令补齐
 
-```
+```bash
 yum install -y bash-completion
 echo 'source <(kubectl completion bash)' >> $HOME/.bashrc
 echo 'source <(kubeadm completion bash)' >> $HOME/.bashrc
+echo 'source <(crictl completion)' >> $HOME/.bashrc
 source $HOME/.bashrc
 
 ```
 
-### 启动kubelet
+#### 启动kubelet
 
 ```
 systemctl enable kubelet
@@ -260,7 +349,7 @@ dns: {}
 etcd:
   local:
     dataDir: /var/lib/etcd
-imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers #镜像加速
 kind: ClusterConfiguration
 kubernetesVersion: 1.23.0
 networking:
@@ -289,10 +378,6 @@ mode: ipvs
 kubeadm init --config kubeadm.yaml
 ```
 
-
-
-
-
 ### 初始化完成后
 
 > 执行引导集群的主机上执行
@@ -303,12 +388,6 @@ kubeadm init --config kubeadm.yaml
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-
-
-
-
-
-
 ### 引导其它机器
 
 #### 拷贝相应文件
@@ -316,31 +395,38 @@ kubeadm init --config kubeadm.yaml
 > 首先需要将一下配置文件拷贝到对应主机上,node节点不需要,只有master需要
 
 ```
-scp -rp /root/.kube/config master-2:/root/.kube/
-scp -rp /root/.kube/config master-3:/root/.kube/
+ssh master-2 "mkdir -p /etc/kubernetes/pki/etcd"
+scp -rp /root/.kube/config master-2:/root/.kube
 scp -rp /etc/kubernetes/pki/ca.* master-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/sa.* master-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/front-proxy-ca.* master-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/etcd/ca.* master-2:/etc/kubernetes/pki/etcd
 scp -rp /etc/kubernetes/admin.conf master-2:/etc/kubernetes
+
+
+ssh master-3 "mkdir -p /etc/kubernetes/pki/etcd"
+scp -rp /root/.kube/config master-3:/root/.kube
 scp -rp /etc/kubernetes/pki/ca.* master-3:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/sa.* master-3:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/front-proxy-ca.* master-3:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/etcd/ca.* master-3:/etc/kubernetes/pki/etcd
 scp -rp /etc/kubernetes/admin.conf master-3:/etc/kubernetes
 
+ssh node-1 "mkdir -p /etc/kubernetes/pki/etcd"
+scp -rp /etc/kubernetes/pki/ca.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/sa.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-1:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/etcd/ca.* node-1:/etc/kubernetes/pki/etcd
+scp -rp /etc/kubernetes/admin.conf node-1:/etc/kubernetes
 
+ssh node-2 "mkdir -p /etc/kubernetes/pki/etcd"
 scp -rp /etc/kubernetes/pki/ca.* node-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/sa.* node-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/etcd/ca.* node-2:/etc/kubernetes/pki/etcd
 scp -rp /etc/kubernetes/admin.conf node-2:/etc/kubernetes
 
-scp -rp /etc/kubernetes/pki/ca.* node-1:/etc/kubernetes/pki
-scp -rp /etc/kubernetes/pki/sa.* node-1:/etc/kubernetes/pki
-scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-1:/etc/kubernetes/pki
-scp -rp /etc/kubernetes/pki/etcd/ca.* node-1:/etc/kubernetes/pki/etcd
-scp -rp /etc/kubernetes/admin.conf node-1:/etc/kubernetes
+
 ```
 
 #### 执行对应的引导命令
@@ -360,6 +446,27 @@ kubeadm join 192.168.91.8:6443 --token abcdef.0123456789abcdef \
         --discovery-token-ca-cert-hash sha256:5e2387403e698e95b0eab7197837f2425f7b8610e7b400e54d81c27f3c6f1964
 ```
 
+### 获取join命令
+
+> 在进行join的过程中,可能会丢失join命令的情况,所以需要生成新的join命令
+
+```shell
+kubeadm token create --print-join-command 
+```
+
+> 如果是master节点,需要在后面添加`--control-plane`
+
+### 重置集群命令
+
+```shell
+iptables -F && iptables -X && iptables -F -t nat && iptables -X -t nat
+iptables -P FORWARD ACCEPT
+```
+
+
+
+
+
 ## 安装calico
 
 [官方配置文档](https://projectcalico.docs.tigera.io/reference/node/configuration)
@@ -367,9 +474,12 @@ kubeadm join 192.168.91.8:6443 --token abcdef.0123456789abcdef \
 > 我在安装的时候发现一个问题,在安装之后发现calico默认使用的是ipip模式,而在这个模式下,不知道为啥,pod可以访问pod,pod可以访问cluster,但是却无法访问Node,我将calico的网络模式换成了BGP模式,这样就可以了
 
 ```
-wget https://docs.projectcalico.org/v3.23/manifests/calico.yaml --no-check-certificate
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
 ```
+
 > 需要添加一个环境变量
+>
+> 搜索,`CALICO_IPV4POOL_IPIP`
 
 ```
         - name: IP_AUTODETECTION_METHOD
@@ -383,7 +493,9 @@ wget https://docs.projectcalico.org/v3.23/manifests/calico.yaml --no-check-certi
 kubectl apply -f calico.yaml
 ```
 
+### 当无法拉去镜像时
 
+> 可以去github直接下载对应的包,然后进行导入
 
 ### 修改IPIP为BGP
 
@@ -394,8 +506,6 @@ kubectl apply -f calico.yaml
 ipipMode: Always --> ipipMode: Never
 ```
 
-
-
 ## 安装Metric
 
 ### 下载yaml
@@ -404,18 +514,16 @@ ipipMode: Always --> ipipMode: Never
 wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability.yaml
 ```
 
-
-
 ### 修改Yaml
 
-```
+```shell
 sed -i "s#k8s.gcr.io/metrics-server#registry.cn-hangzhou.aliyuncs.com/chenby#g" high-availability.yaml
-args添加tls证书配置选项
+sed -i "/args/a\        - --kubelet-insecure-tls" high-availability.yaml 
+
+# args添加tls证书配置选项
 vim high-availability.yaml
 添加"- --kubelet-insecure-tls"
 ```
-
-
 
 ### 应用Yaml
 
@@ -423,16 +531,14 @@ vim high-availability.yaml
 kubectl apply -f high-availability.yaml
 ```
 
-
-
 ### 查看结果
 
-```
-查看metrics资源
+```shell
+# 查看metrics资源
 kubectl  get pod -n kube-system | grep metrics
 metrics-server-65fb95948b-2bcht            1/1     Running   0             32s
 metrics-server-65fb95948b-vqp5s            1/1     Running   0             32s
-查看node资源情况
+# 查看node资源情况
 kubectl  top node
 NAME           CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   
 k8s-master01   127m         1%     2439Mi          64%       
@@ -441,6 +547,32 @@ k8s-node02     53m          0%     1264Mi          16%
 ```
 
 
+
+# 遇到奇奇怪怪的问题
+
+## failed to pull and unpack image "docker.io/bitnami/nginx:1.23.3-debian-11-r3": failed to unpack image on snapshotter overlayfs: unexpected media type text/html
+
+> 拉取镜像的时候,会出现这种错误,解决方法
+>
+> 修改`/etc/containerd/config.toml`
+>
+> 搜索config_path,将其修改为空
+>
+> ```bash
+> sed -i 's#/etc/containerd/certs.d##g' /etc/containerd/config.toml
+> ```
+>
+> ![image-20230103234956736](https://cdn.jsdelivr.net/gh/2822132073/image/202301032349307.png)
+
+
+
+## Failed to pull image  rpc error: code = Unknown desc = failed to pull image "docker.io/yangxikun/k8s-dns-sidecar-amd64:1.14.7": failed commit on ref "layer-sha256:a413d646ee118a8ca25fb59e56351633a386088e0f603f3b9ca173daf945ccf8": "layer-sha256:a413d646ee118a8ca25fb59e56351633a386088e0f603f3b9ca173daf945ccf8" failed size validation: 10068781 != 9333267
+
+> ```shell
+> rm -rf /var/lib/containerd/io.containerd.content.v1.content/ingest
+> ```
+>
+> 删除哪些没有下载完成的镜像缓存
 
 ## 参考文档
 
