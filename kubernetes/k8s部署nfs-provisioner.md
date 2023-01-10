@@ -2,7 +2,56 @@
 
 [github项目地址](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner)
 
-> 在`nfs-client-provisioner`可能调度到的节点安装**nfs-client**,不然无法使用,具体怎么做就不写了,网上都有
+```shell
+# 为所有节点安装 nfs-common
+sudo apt install nfs-common
+
+# 在存储节点上安装 nfs-common
+sudo apt install nfs-kernel-server
+
+# 创建共享目录
+mkdir /mnt/nfs_share
+chmod -R 777 /mnt/nfs_share
+
+# 添加访问权限
+sudo vim /etc/exports
+# 在最后一行写入
+/mnt/nfs_share 192.168.2.0/24(rw,sync,no_subtree_check,no_root_squash)
+# 第一个为共享的目录,第二个为允许访问的IP(*为所有都可以访问),第三个为权限
+# 启动 nfs 服务
+systemctl start nfs-server.service 
+systemctl enable nfs-server.service 
+
+
+# 检验是否成功开启
+sudo showmount -e 192.168.2.102
+# Export list for 192.168.2.102:
+# /mnt/nfs_share 192.168.2.0/24
+```
+
+
+
+
+
+> lank8s.cn可以加速k8s.grc.io,但是需要跳过验证
+
+```
+mkdir /etc/containerd/certs.d/lank8s.cn -pv
+cat > /etc/containerd/certs.d/lank8s.cn/hosts.toml << EOF
+server = "https://lank8s.cn"
+[host."https://lank8s.cn"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true
+EOF
+## 重启生效加速
+systemctl daemon-reload
+systemctl enable --now containerd
+systemctl restart containerd
+```
+
+
+
+
 
 **RBAC**
 

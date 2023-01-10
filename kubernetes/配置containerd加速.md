@@ -4,6 +4,27 @@
 
 [github配置说明](https://github.com/containerd/containerd/blob/main/docs/hosts.md)
 
+
+
+
+
+> 注意在使用镜像加速时,与之前docker中不相同,例如:
+>
+> ```bash
+> cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
+> server = "https://docker.io"
+> [host."https://hub-mirror.c.163.com"]
+>   capabilities = ["pull", "resolve"]
+> EOF
+> ```
+>
+> 现在在使用containerd作为cri时,需要用加速的地址,而不是使用原来的地址
+>
+> ```bash
+> docker.io/library/nginx:1.14  # 原来的地址
+> hub-mirror.c.163.com/library/nginx:1.14 #需要在k8s中填的地址
+> ```
+
 > 下面的配置会在crictl拉取镜像时默认使用,而ctr命令行工具指定才可以使用
 >
 > ```bash
@@ -30,3 +51,4 @@ EOF
 > - skip_verify = true
 >
 > 还有很多选项,可以在github页面查看
+

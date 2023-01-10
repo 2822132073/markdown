@@ -129,96 +129,21 @@ wget -O /etc/yum.repos.d/docker.repo http://mirrors.aliyun.com/docker-ce/linux/c
 
 ### 安装 containerd
 
-
-
 ```bash
 yum install -y containerd.io
 ```
 
-### 修改containerd配置文件
 
-> `root` 容器存储路径，修改成磁盘空间充足的路径
->
-> `sandbox_image` pause 镜像名称以及镜像tag（一定要可以拉取到 pause 镜像的，否则会导致集群初始化的时候 kubelet 重启失败）
->
-> `bin_dir` cni 插件存放路径，yum 安装的 containerd 默认存放在 /opt/cni/bin 目录下
-
-#### 获得默认配置文件
-
-```
-containerd config default >/etc/containerd/config.toml
-```
-
-#### 对其进行相应的修改
-
-```shell
-# 修改Containerd的配置文件
-sed -i "s#SystemdCgroup\ \=\ false#SystemdCgroup\ \=\ true#g" /etc/containerd/config.toml
-cat /etc/containerd/config.toml | grep SystemdCgroup
-
-sed -i "s#registry.k8s.io#registry.cn-hangzhou.aliyuncs.com/chenby#g" /etc/containerd/config.toml
-cat /etc/containerd/config.toml | grep sandbox_image
-
-sed -i "s#config_path\ \=\ \"\"#config_path\ \=\ \"/etc/containerd/certs.d\"#g" /etc/containerd/config.toml
-cat /etc/containerd/config.toml | grep certs.d
-
-mkdir /etc/containerd/certs.d/docker.io -pv
-
-cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
-server = "https://docker.io"
-[host."https://hub-mirror.c.163.com"]
-  capabilities = ["pull", "resolve"]
-EOF
-```
-
-#### **配置镜像加速**
-
-```shell
-cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
-server = "https://docker.io"
-[host."https://hub-mirror.c.163.com"]
-  capabilities = ["pull", "resolve"]
-EOF
-## 重启生效加速
-systemctl daemon-reload
-systemctl enable --now containerd
-systemctl restart containerd
-```
-
-#### 配置crictl的containerd的socket位置
-
-```bash
-cat > /etc/crictl.yaml <<'EOF'
-runtime-endpoint: "unix:///run/containerd/containerd.sock"
-image-endpoint: "unix:///run/containerd/containerd.sock"
-timeout: 0
-debug: false
-pull-image-on-create: false
-disable-pull-on-run: false
-EOF
- 
- 
-# 或者执行下面的两条命令来生成配置文件
-crictl config runtime-endpoint unix:///run/containerd/containerd.sock
-crictl config image-endpoint unix:///run/containerd/containerd.sock
-```
-
-
-
-
-
-### 启动 containerd 服务，**并设置为开机启动**
-
-```
-systemctl enable containerd
-systemctl restart containerd
-```
 
 ## 安装kubeadm,kubelet
 
 ### ubuntu18.04
 
 [阿里云](https://developer.aliyun.com/mirror/kubernetes/?spm=a2c6h.25603864.0.0.71132529B0RUxM)
+
+#### 安装kubeadm
+
+> 安装kubeadm同时会安装kubelet还有containerd,在安装时,必须明确的指定每个安装包的版本,没有指定版本的安装包会默认安装最新版本
 
 ```bash
 apt-get update && apt-get install -y apt-transport-https
@@ -230,9 +155,20 @@ apt-get update
 apt-get install -y kubelet kubeadm kubectl
 ```
 
+#### 如何安装指定版本
+
 ```shell
 sudo apt-cache madison package #使用 apt-cache madison 列出软件的所有来源
 sudo apt-get install package=version #通过apt-get安装指定版本的软件
+```
+
+#### 命令补全
+
+```shell
+echo 'source <(kubectl completion bash)' >> $HOME/.bashrc
+echo 'source <(kubeadm completion bash)' >> $HOME/.bashrc
+echo 'source <(crictl completion)' >> $HOME/.bashrc
+source $HOME/.bashrc
 ```
 
 
@@ -280,6 +216,77 @@ source $HOME/.bashrc
 ```
 systemctl enable kubelet
 systemctl restart kubelet
+```
+
+
+
+## 修改containerd配置文件
+
+> `root` 容器存储路径，修改成磁盘空间充足的路径
+>
+> `sandbox_image` pause 镜像名称以及镜像tag（一定要可以拉取到 pause 镜像的，否则会导致集群初始化的时候 kubelet 重启失败）
+>
+> `bin_dir` cni 插件存放路径，yum 安装的 containerd 默认存放在 /opt/cni/bin 目录下
+
+### 获得默认配置文件
+
+```
+containerd config default >/etc/containerd/config.toml
+```
+
+### 对其进行相应的修改
+
+```shell
+# 修改Containerd的配置文件
+sed -i "s#SystemdCgroup\ \=\ false#SystemdCgroup\ \=\ true#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep SystemdCgroup
+
+sed -i "s#registry.k8s.io#registry.cn-hangzhou.aliyuncs.com/chenby#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep sandbox_image
+
+sed -i "s#config_path\ \=\ \"\"#config_path\ \=\ \"/etc/containerd/certs.d\"#g" /etc/containerd/config.toml
+cat /etc/containerd/config.toml | grep certs.d
+
+```
+
+### **配置镜像加速**
+
+```shell
+mkdir /etc/containerd/certs.d/docker.io -pv
+cat > /etc/containerd/certs.d/docker.io/hosts.toml << EOF
+server = "https://docker.io"
+[host."https://hub-mirror.c.163.com"]
+  capabilities = ["pull", "resolve"]
+EOF
+## 重启生效加速
+systemctl daemon-reload
+systemctl enable --now containerd
+systemctl restart containerd
+```
+
+### 配置crictl的containerd的socket位置
+
+```bash
+cat > /etc/crictl.yaml <<'EOF'
+runtime-endpoint: "unix:///run/containerd/containerd.sock"
+image-endpoint: "unix:///run/containerd/containerd.sock"
+timeout: 0
+debug: false
+pull-image-on-create: false
+disable-pull-on-run: false
+EOF
+ 
+ 
+# 或者执行下面的两条命令来生成配置文件
+crictl config runtime-endpoint unix:///run/containerd/containerd.sock
+crictl config image-endpoint unix:///run/containerd/containerd.sock
+```
+
+### 启动 containerd 服务，**并设置为开机启动**
+
+```
+systemctl enable containerd
+systemctl restart containerd
 ```
 
 ## kubeadm部署kubernetes
@@ -333,7 +340,7 @@ localAPIEndpoint:
   advertiseAddress: 172.16.0.211   #当前主机的IP
   bindPort: 6443
 nodeRegistration:
-  criSocket: /run/containerd/containerd.sock  #containerd.sock的地址
+      criSocket: /run/containerd/containerd.sock  #containerd.sock的地址
   imagePullPolicy: IfNotPresent
   name: master-1  #当前主机的主机名
   taints: null
@@ -394,6 +401,24 @@ kubeadm init --config kubeadm.yaml
 
 > 首先需要将一下配置文件拷贝到对应主机上,node节点不需要,只有master需要
 
+**脚本**
+
+```bash
+#!bin/bash
+Node=$1
+ssh master-2 "mkdir -p /etc/kubernetes/pki/etcd"
+if [[ $Node =~ master* ]];then
+scp -rp /root/.kube/config master-2:/root/.kube
+fi
+scp -rp /etc/kubernetes/pki/ca.* master-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/sa.* master-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/front-proxy-ca.* master-2:/etc/kubernetes/pki
+scp -rp /etc/kubernetes/pki/etcd/ca.* master-2:/etc/kubernetes/pki/etcd
+scp -rp /etc/kubernetes/admin.conf master-2:/etc/kubernetes
+```
+
+
+
 ```
 ssh master-2 "mkdir -p /etc/kubernetes/pki/etcd"
 scp -rp /root/.kube/config master-2:/root/.kube
@@ -425,8 +450,6 @@ scp -rp /etc/kubernetes/pki/sa.* node-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/front-proxy-ca.* node-2:/etc/kubernetes/pki
 scp -rp /etc/kubernetes/pki/etcd/ca.* node-2:/etc/kubernetes/pki/etcd
 scp -rp /etc/kubernetes/admin.conf node-2:/etc/kubernetes
-
-
 ```
 
 #### 执行对应的引导命令

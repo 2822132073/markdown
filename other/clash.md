@@ -83,6 +83,7 @@ EOF
 ## 配置`clash`实现翻墙
 ### 启动`clash`
 ```shell
+systemctl daemon-reload 
 systemctl start clash
 systemctl enable clash
 ```
@@ -92,7 +93,7 @@ systemctl enable clash
 > 想在登录时就自动设置,就在`$HOME/.bash_profile`下将其添加进去
 
 ```shell
-IP=127.0.0.1
+IP=192.1
 export http_proxy=$IP:7890
 export https_proxy=$IP:7890
 ```
@@ -103,4 +104,21 @@ export https_proxy=$IP:7890
 >
 >  如果之前登录过,需要修改clash的地址
 
-![image-20220427205656602](D:\markdown\other\Linux命令行安装clash,并翻墙.assets\image-20220427205656602.png)
+```
+cat >/lib/systemd/system/clash.service<<EOF
+[Unit]
+Description=clash
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/clash -d /etc/clash/
+Restart=on-failure
+RestartSec=3s
+LimitNOFILE=999999
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
