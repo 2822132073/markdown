@@ -1,8 +1,8 @@
-# 安装docker-compose和Docker-machine
+
 
 [TOC]
 
-
+# V1版本安装
 
 ```shell
 curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -35,6 +35,17 @@ docker-compose --version
 ```
 
 
+
+# v2版本安装
+
+```bash
+mkdir -p ~/.docker/cli-plugins/
+curl -SL https://get.daocloud.io/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+
+chmod +x ~/.docker/cli-plugins/docker-compose
+
+docker compose version
+```
 
 
 
