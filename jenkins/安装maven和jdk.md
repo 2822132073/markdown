@@ -21,7 +21,6 @@ rm -f apache-maven-3.8.7-bin.tar.gz
 
 ![image-20230112201414521](https://cdn.jsdelivr.net/gh/2822132073/image/202301122014465.png)
 
-
 **修改maven配置文件**
 
 > maven的配置文件在maven目录下的`conf/settings.xml`文件,主要修改的两个位置
@@ -46,6 +45,13 @@ rm -f apache-maven-3.8.7-bin.tar.gz
 **声明jar存放位置**
 
 > 搜索localRepository,在其下面添加一个,这个路径指的是,jar包存放的位置,我声明的位置是在存储卷中,以免每次jenkins pod重启,他的缓存都会丢失,也可以指向另外一个卷中
+
+```bash
+mkdir /var/jenkins_home/maven_repository
+chown 1000:1000  /var/jenkins_home/maven_repository
+```
+
+> 不修改权限的话,maven无法创建目录
 
 ```xml
   <localRepository>/var/jenkins_home/maven_repository</localRepository>
