@@ -171,7 +171,7 @@ vi prometheusOperator/prometheusOperator-deployment.yaml
 
 prometheusOperator-deployment.yaml 
 
-###    6、安装Prometheus Operator 
+###    6、安装Prometheus Operator
 
 ```bash
 kubectl create -f setup/ 
@@ -265,7 +265,7 @@ grafana 首页
 ![img](https://pic1.zhimg.com/v2-6e20242aca0aa0cbd03fd5fc1748f1e0_b.jpg)
 
 grafana dashboard
- 
+
 
 ![img](https://pic4.zhimg.com/v2-772bed4bd87e4d8b73bcf328842edaeb_b.jpg)
 

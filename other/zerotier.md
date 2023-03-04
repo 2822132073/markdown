@@ -189,12 +189,6 @@ ip route add DEST_NETWORK via GATEWAY dev INTERFACE_NAME
 
 
 
-![image-20220426135851986](D:\markdown\other\zerotire.assets\image-20220426135851986.png)
-
-![image-20220426140222600](D:\markdown\other\zerotire.assets\image-20220426140222600.png)
-
-
-
 
 
 ## 使用dns解析主机名(不需要记ip)
