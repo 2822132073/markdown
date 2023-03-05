@@ -289,6 +289,12 @@ const key = 'src'
 
 在表单输入元素或组件上创建双向绑定。根据表单输入元素或组件输出的值而变化
 
+修饰符:
+
+- [`.lazy`](https://cn.vuejs.org/guide/essentials/forms.html#lazy) - 监听 `change` 事件而不是 `input`
+- [`.number`](https://cn.vuejs.org/guide/essentials/forms.html#number) - 将输入的合法符串转为数字
+- [`.trim`](https://cn.vuejs.org/guide/essentials/forms.html#trim) - 移除输入内容两端空格
+
 ```vue
 <template>
   <p><input type="text" v-model="msg"></p>
