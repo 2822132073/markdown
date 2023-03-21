@@ -96,6 +96,8 @@ test> db.mycollection02.insertMany(
 
 [MongoDB学习笔记-Mongo Shell 常用查询命令 (qq.com)](https://mp.weixin.qq.com/s?__biz=MzI4MjQzMDQzNw==&mid=2247484268&idx=4&sn=8dd3f835d548d123a2513388bcebcf9c&chksm=eb9b5de6dcecd4f09083f60811b15f15dd1ac3ab004cad3b8dc399502330e9e619c1cd7d73cb&token=1410098719&lang=zh_CN#rd)
 
+[查询操作符手册](https://www.mongodb.com/docs/manual/reference/operator/query/)
+
 ## 生成示例数据
 
 > 创建一年级的3个班，并随机添加 10 名学生
@@ -188,7 +190,7 @@ test> db.grade_1_2.find({"name": {$in: [new RegExp("zhangsan1"), new RegExp("zha
 ### 查看一年级二班grade_1_2中所有兴趣爱好有三项的学生
 
 ```bash
-db.getCollection('grade_1_2').find({"hobby": {$size: 3}})　
+db.grade_1_2.find({"hobby": {$size: 3}})　
 ```
 
 ### 查看一年级二班`grade_1_2`中所有兴趣爱好包括画画的学生
@@ -256,3 +258,92 @@ db.grade_1_2.distinct('age', {"sex": 0})
 > `deleteOne`:只删除过滤出的文档的第一个
 >
 > `deleteMany`:删除所有过滤出来的文档
+
+## 一年级二班grade_1_2， 删除所有 4 岁的学生
+
+```bash
+db.grade_1_2.deleteOne({"age": 4})  #删除搜索出来第一个age为4的学生
+db.grade_1_2.deleteMany({"age": 4}) #删除搜索所有age为4的学生
+```
+
+# 更新数据
+
+[更新操作符手册](https://www.mongodb.com/docs/manual/reference/operator/update/)
+
+> `db.collection.updateOne()`:当过滤出来多个文档,只修改第一个
+>
+> `db.collection.updateMany()`:修改所有过滤出来的文档
+
+## 一年级二班grade_1_2中，修改名为zhangsan1的学生，年龄为 8 岁，兴趣爱好为 跳舞和画画；
+
+> `$set`是指直接覆盖指定的元素的值
+
+```bash
+db.grade_1_2.updateOne({"name": "zhangsan1"}, {$set: {"age": 8, "hobby": ["dance", "drawing"]}})　
+```
+
+##  一年级二班`grade_1_2`中，追加zhangsan1学生兴趣爱好唱歌；
+
+> 这里的`$push`指的是将元素推入数组之中,是指的是添加操作,这里只能添加一个元素到数组
+
+```bash
+db.grade_1_2.updateOne({"name": "zhangsan1"}, {$push: {"hobby": "sing"}})　
+```
+
+##  一年级二班`grade_1_2`中，追加zhangsan7学生兴趣爱好吹牛和打篮球；
+
+> 上面`$push`无法进行添加多个元素到数组,加上这里的`$each`就可以添加多个元素了
+
+```bash
+db.grade_1_2.updateOne({"name": "zhangsan1"}, {$push: {"hobby": {$each: ["brag", "play_basketball"]}}})　
+```
+
+##  一年级二班`grade_1_2`中，追加`zhangsan7`学生兴趣爱好唱歌和打篮球，要保证`hobby`数组不重复；
+
+> `$addToSet`和`$push`在数组中已经有重复值时,操作时不同的,`$push`会,再讲元素推入,而`$addToSet`不会,不进行任何操作
+
+```bash
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$addToSet: {"hobby": {$each: ["sing1", "play_basketball"]}}})
+```
+
+## 新学年，给一年级二班所有学生的年龄都增加一岁
+
+```bash
+db.grade_1_2.updateMany({}, {$inc: {"age": 1}})
+```
+
+## 一年级二班grade_1_2中，删除zhangsan7学生的sex属性
+
+```bash
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$unset: {"sex": 1}})　
+```
+
+## 一年级二班grade_1_2中，删除zhangsan7学生的hobby数组中的头元素
+
+> `$pop`中的-1指的是头元素,而1为最后一个元素,只能为这两种值
+
+```bash
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$pop: {"hobby": -1}})
+```
+
+##  一年级二班`grade_1_2`中，删除`zhangsan7`学生的`hobby`数组中的尾元素
+
+```bash
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$pop: {"hobby": 1}})
+```
+
+##  一年级二班`grade_1_2`中，删除`zhangsan7`学生的`hobby`数组中的`sing`元素
+
+> `$pull`可以指定对那些元素进行删除,可以使用搜索的相关的表达式进行匹配
+
+```bash
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$pull: {"hobby": "sing"}}
+db.grade_1_2.updateMany({"name": "zhangsan7"}, {$pull: {"hobby": { $regex: /s.*/ }}}) #删除以s开头的hobby
+```
+
+
+
+
+
+
+
