@@ -946,3 +946,62 @@ class MybatisDemoApplicationTests {
 
 > 用在pojo类的属性上,指定对应的是哪个字段,在属性在数据库表中不存在时,可以将其设置为`exeist = false`
 
+## 三层架构
+
+![image-20230403182722932](https://cdn.jsdelivr.net/gh/2822132073/image/202304031904559.png)
+
+`mapper/UserMapper`
+
+```java
+package com.fsl.json.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.fsl.json.pojo.User;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Mapper
+@Repository
+// 这里的BaseMapper中的泛型填的是pojo类
+public interface UserMapper extends BaseMapper<User> {
+}
+```
+
+`service/UserService`
+
+```java
+package com.fsl.json.service;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.fsl.json.pojo.User;
+import org.springframework.stereotype.Service;
+
+
+// @Service
+// 这里的IService的pojo类
+public interface UserService extends IService<User>  {
+}
+
+```
+
+`service/Impl/UserService`
+
+```java
+package com.fsl.json.service.Impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fsl.json.mapper.UserMapper;
+import com.fsl.json.pojo.User;
+import com.fsl.json.service.UserService;
+import org.springframework.stereotype.Service;
+
+
+@Service
+// ServiceImpl前面的泛型填mapper下的interface,后面的填pojo类,implements填对应的Service
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+}
+```
