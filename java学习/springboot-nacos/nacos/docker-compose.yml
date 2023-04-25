@@ -1,0 +1,81 @@
+version: '3.8'
+services:
+  mysql:
+    hostname: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456789"
+    image: bitnami/mysql:5.7
+    volumes:
+    - type: bind
+      source: /root/nacos/mysql
+      target: /bitnami/mysql/data
+      bind:
+        create_host_path: true
+    - type: bind
+      source: /root/nacos/mysql-schema.sql
+      target: /docker-entrypoint-initdb.d/nacos-mysql.sql
+      bind:
+        create_host_path: true
+    configs:
+      - source: mysql_custom_config
+        target: /opt/bitnami/mysql/conf/my_custom.cnf
+  nacos1:
+    hostname: nacos1
+    environment:
+      MODE: cluster
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_HOST: "mysql"
+      MYSQL_SERVICE_PASSWORD: "123456789"
+      MYSQL_SERVICE_PORT: "3306"
+      MYSQL_SERVICE_USER: root
+      NACOS_APPLICATION_PORT: "8848"
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      PREFER_HOST_MODE: hostname 
+      SPRING_DATASOURCE_PLATFORM: mysql
+    image: nacos/nacos-server:1.4.1
+    ports:
+    - mode: ingress
+      target: 8848
+      published: "8857"
+      protocol: tcp
+  nacos2:
+    hostname: nacos2
+    environment:
+      MODE: cluster
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_HOST: "mysql"
+      MYSQL_SERVICE_PASSWORD: "123456789"
+      MYSQL_SERVICE_PORT: "3306"
+      MYSQL_SERVICE_USER: root
+      NACOS_APPLICATION_PORT: "8848"
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      PREFER_HOST_MODE: hostname 
+      SPRING_DATASOURCE_PLATFORM: mysql
+    image: nacos/nacos-server:1.4.1
+    ports:
+    - mode: ingress
+      target: 8848
+      published: "8858"
+      protocol: tcp
+  nacos3:
+    hostname: nacos3
+    environment:
+      MODE: cluster
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_HOST: "mysql"
+      MYSQL_SERVICE_PASSWORD: "123456789"
+      MYSQL_SERVICE_PORT: "3306"
+      MYSQL_SERVICE_USER: root
+      NACOS_APPLICATION_PORT: "8848"
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      PREFER_HOST_MODE: hostname 
+      SPRING_DATASOURCE_PLATFORM: mysql
+    image: nacos/nacos-server:1.4.1
+    ports:
+    - mode: ingress
+      target: 8848
+      published: "8859"
+      protocol: tcp
+configs:
+  mysql_custom_config:
+    file: /root/nacos/my_custom.cnf

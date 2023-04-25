@@ -239,3 +239,26 @@ const {increment, deduce} = test
 </style>
 ```
 
+### 使用computed给普通变量响应式
+
+> 上面提到,当应用的变量是简单数据类型,在解构时需要使用`storeToRefs`,可以使用`computed`将其包裹,将其返回,在使用时,直接使用这个变量(isLogin),这个变量就是响应式的
+
+```js
+import {defineStore} from 'pinia'
+import {computed, ref} from "vue"
+
+export const useLoginStore = defineStore('login', () => {
+    const login = ref(false);
+
+    const isLogin = computed(() => {
+        return login
+    })
+
+    function setLogin(bool) {
+        login.value = bool
+    }
+
+    return {isLogin, setLogin}
+})
+```
+
