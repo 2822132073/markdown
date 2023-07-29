@@ -25,6 +25,12 @@ apt-get -y install build-essential libpcre3 libpcre3-dev zlib1g-dev openssl libs
 
 # 安装
 
+配置文件位置：/etc/nginx/nginx.conf
+
+根目录位置：/usr/share/nginx/html
+
+## 编译
+
 ```bash
 root@template:~# wget http://nginx.org/download/nginx-1.20.2.tar.gz
 root@template:~# tar xf nginx-1.20.2.tar.gz nginx-1.20.2/
@@ -70,10 +76,10 @@ root@template:~/nginx-1.20.2# ln -s /usr/share/nginx/sbin/nginx /usr/sbin/nginx
 
 
 
-
+## 编写systemd启动脚本
 
 ```ini
-root@template:/var/lib/nginx# cat /lib/systemd/system/nginx.service
+root@template:/var/lib/nginx# cat >/lib/systemd/system/nginx.service<<EOF
 [Unit]
 Description=A high performance web server and a reverse proxy server
 Documentation=man:nginx(8)
@@ -92,7 +98,7 @@ KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target
-
+EOF
 ```
 
 > `start-stop-daemon`是系统自带的命令,用于关闭daemon

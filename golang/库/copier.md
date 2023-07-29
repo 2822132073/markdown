@@ -2,6 +2,14 @@
 
 copier没有什么复杂的操作,可以做文章只有Option这个来说,所以后面几乎都是围绕这个来说的
 
+```shell
+go get github.com/jinzhu/copier
+```
+
+## 参考
+
+[Golang Copier 从入门到入坑](https://learnku.com/articles/73338)
+
 ## Copy
 
 - 调用同名方法为字段赋值；
@@ -145,14 +153,20 @@ func main() {
 需要注意这里的TypeConverter的定义,传入的是接口,返回的也是接口,还有这里的SrcType和DstType,传入的这个类型的**任意一个值**就行,不是传入字符串
 
 ```go
-
 type People1 struct {
 	Name     string
 	Birthday time.Time
+	T        time.Time
 }
 type People2 struct {
 	Name     string
 	Birthday int64
+	T        time.Time
+}
+
+func UnixToTime(unix any) (any, error) {
+	milli := time.UnixMilli(unix.(int64))
+	return milli, nil
 }
 
 func TimeToUnix(t any) (any, error) {
@@ -162,12 +176,12 @@ func TimeToUnix(t any) (any, error) {
 }
 
 func main() {
-	var p1 = People1{Name: "fsl", Birthday: time.UnixMilli(1689423165871)}
+	var p1 = People1{Name: "fsl", Birthday: time.UnixMilli(1689423165871), T: time.UnixMilli(1689423165871)}
 	var p2 = People2{}
 	err := copier.CopyWithOption(&p2, &p1, copier.Option{Converters: []copier.TypeConverter{
 		{
 			SrcType: time.Time{},
-			DstType: int64(0),
+			DstType: int64(99999),
 			Fn:      TimeToUnix,
 		},
 	}})
@@ -176,7 +190,8 @@ func main() {
 		return
 	}
 	fmt.Println(p1, p2)
-    // {fsl 2023-07-15 20:10:14.1022942 +0800 CST m=+0.004753801} {fsl 1689423014102}
+	//{fsl 2023-07-15 20:12:45.871 +0800 CST 2023-07-15 20:12:45.871 +0800 CST} {fsl 1689423165871 2023-07-15 20:12:45.871 +0800 CST}
+
 }
 ```
 

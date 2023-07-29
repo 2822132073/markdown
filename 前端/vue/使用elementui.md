@@ -1,3 +1,11 @@
+## 安装element-ui
+
+> 在按需引入之前,必须安装element-ui
+
+```js
+ npm install element-plus --save
+```
+
 ### 完整引入[#](https://element-plus.org/zh-CN/guide/quickstart.html#完整引入)
 
 如果你对打包后的文件大小不是很在乎，那么使用完整导入会更方便。
@@ -38,7 +46,7 @@ app.mount('#app')
 首先你需要安装`unplugin-vue-components` 和 `unplugin-auto-import`这两款插件
 
 ```bash
-npm install -D unplugin-vue-components unplugin-auto-import
+npm install -D unplugin-vue-components unplugin-auto-import elemen
 ```
 
 然后把下列代码插入到你的 `Vite` 或 `Webpack` 的配置文件中

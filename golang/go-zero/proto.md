@@ -5,7 +5,7 @@ syntax = "proto3";
 
 package blog;
 
-// 生成 golang 代码后的包名
+// 生成 golang 代码后的包名，以及代码位置
 option go_package = "../proto/blog";
 
 // 定义一个博客消息类型，包含 id、title 和 content 字段
