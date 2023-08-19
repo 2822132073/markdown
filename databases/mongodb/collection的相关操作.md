@@ -2,6 +2,25 @@
 
 
 
+# 获取collection操作
+
+一般情况下可以先进入对应的db下
+
+```bash
+use db_name;
+db.collection_name.对应操作;
+```
+
+但是当collection的开头字母时，会报错：`SyntaxError: Missing semicolon.`，需要使用一下形式：
+
+```bash
+db['2023-8-18'].dataSize();
+或者
+db.getCollection('2023-8-18').dataSize();
+```
+
+
+
 # 创建一个collection
 
 > 创建一个collection,可以使用`db.createCollection()`,也可以直接进行插入操作

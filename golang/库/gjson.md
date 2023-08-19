@@ -4,6 +4,12 @@
 
 
 
+```bah
+go get -u github.com/tidwall/gjson
+```
+
+
+
 ### 验证字符串或字节切片是否有效
 
 ```go
