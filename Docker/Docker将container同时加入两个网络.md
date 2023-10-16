@@ -23,8 +23,8 @@ e957a6ee57cc36a90ac46c80722b03d6efb131f3491a460d7e403f87f82e690d
 fc67eed08df58adf69279e64845136373aea5cfebea3d5e5001acd4609ff2ea5
 ```
 
-- --subnet指定网段
-- --gateway指定网关
+- `--subnet`指定网段
+- `--gateway`指定网关
 
 ### 创建一个Container
 

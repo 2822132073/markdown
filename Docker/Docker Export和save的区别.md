@@ -19,7 +19,6 @@
 >`docker create`命令允许我们创建一个`可写层`在镜像的只读层的顶部,然后通过`docker start`启动它,在`docker start`启动之前,`容器`并没有独立的名称空间,只有自己的`读写层`,在启动后,`docker`会创建独立的名称空间,并且将`容器`放进去.
 >
 >> ```shell
->> 
 >> [root@node01 ~]# docker create -ti busybox sh
 >> 533e04b09b6f956bbe3526f35fc77b0d9e6bb92d9f3e6705d5a08c677acfe40c
 >> [root@node01 ~]# ls /run/docker/netns/
@@ -34,8 +33,7 @@
 >> 533e04b09b6f        busybox             "sh"                30 seconds ago      Up 4 seconds                            kind_banzai
 >> [root@node01 ~]# ls /run/docker/netns/
 >> 1-vg6yiuz1vw  3a960bf7f4af  ingress_sbox
->> ```
->>
+>
 >> *可以看出名称空间在变化启动前和启动后,有添加*
 
 

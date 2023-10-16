@@ -9,7 +9,7 @@
 >
 > `docker_gwbridge`是一个`bridge`网络,负责,容器与主机通信
 >
-> `ingress`是一个`overlay2`的虚拟的二层覆盖网络,这个网络用于将服务暴露给外部访问，docker swarm就是通过它实现的routing mesh（将外部请求路由到不同主机的容器）。
+> `ingress`是一个`overlay2`的虚拟的二层覆盖网络,这个网络用于将服务暴露给外部访问，`docker swarm`就是通过它实现的routing mesh（将外部请求路由到不同主机的容器）。
 
 ## Docker-Swarm中的容器如何与其他主机上的容器通信
 
@@ -248,7 +248,7 @@
 > 172.18.0.0      0.0.0.0         255.255.0.0     U     0      0        0 docker_gwbridge
 > ```
 >
-> 而`172.18.0.2`在一个叫做`ingress_sbox`的名称空间内,进去看看他的`IP`情况
+> 而`172.18.0.2`在一个叫做`ingress_sbox`的名称空间内,进去看看他的`IP`情况，可以看到这里的`172.18.0.2`的设备号为14，对端设备号为15
 >
 > ```shell
 > [root@manager ~]# nsenter --net=/run/docker/netns/ingress_sbox ip a
@@ -352,11 +352,11 @@
 >
 > > 到这个为止,报文的目的端口还是`8080`,并没有变成`80`,所以在所有的容器的网络名称空间中都有这样一条`iptables`规则存在于`PREROUTING`上
 >
-> ```shel
+> ```shell
 > -A PREROUTING -d 10.11.0.21/32 -p tcp -m tcp --dport 8080 -j REDIRECT --to-ports 80
 > ```
 >
 > > 当目的地址为自身的服务`IP`时,就会将目的端口转换为`80`,这样就完成了负载均衡
 >
-> <img src="D:\markdown\Docker\Docker-swarm网络.assets\201805040929325.png" alt="img" style="zoom:200%;" />
+> <img src="https://cdn.jsdelivr.net/gh/2822132073/image/202310101628341.png" alt="img" style="zoom:200%;" />
 
