@@ -10,7 +10,7 @@ kubectl get pod|service [podName|serviceName] -n <namespace>
 
 Cobra 中有两种标志：持久标志 ( Persistent Flags ) 和 本地标志 ( Local Flags ) 。
 
-持久标志：指所有的 commands 都可以使用该标志。比如：--verbose ，--namespace
+持久标志：指所有的 commands 都可以使用该标志。比如：`--verbose` ，`--namespace`
 本地标志：指特定的 commands 才可以使用该标志。
 
 # 使用

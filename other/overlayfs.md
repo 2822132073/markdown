@@ -6,7 +6,7 @@
 
 ## overlayfs基本原理
 
-![img](.\overlayfs.assets\1580705-20191230141201863-1669781061.png)
+![在这里插入图片描述](https://cdn.jsdelivr.net/gh/2822132073/image/202404071641068.png)
 
 
 
@@ -29,7 +29,13 @@ mkdir overlayfs/work -p
 
 ### 创建相关文件
 
-> 注意,我们在**lowerdir1**创建了**1,2,3**三个文件,但是只向 其中的 **1**写入了正确内容,其它两个都是写入的英文字符,在**lowerdir2**创建了 **2,3**两个文件,在 **2**中写入了正确的数字,在另外一个文件中写入英文字符,在**lowerdir3**只创建一个文件 **3**,并写入字符三
+> 注意
+>
+> 在**lowerdir1**创建了**1,2,3**三个文件,但是只向 其中的 **1**写入了正确内容,其它两个都是写入的英文字符
+>
+> 在**lowerdir2**创建了 **2,3**两个文件,在 **2**中写入了正确的数字,在另外一个文件中写入英文字符
+>
+> 在**lowerdir3**只创建一个文件 **3**,并写入字符3
 
 ```shell
 cd overlayfs
@@ -50,7 +56,7 @@ echo upper >upperdir/upper
 
 
 
-
+![image-20240407164724159](https://cdn.jsdelivr.net/gh/2822132073/image/202404071647187.png)
 
 ### 创建overlayfs
 
@@ -70,13 +76,15 @@ mount -t overlay overlay -o lowerdir=lowerdir3:lowerdir2:lowerdir1,upperdir=uppe
 
 ### 验证结果
 
-![image-20220426203746110](.\overlayfs.assets\image-20220426203746110.png)
+![image-20240407164820067](https://cdn.jsdelivr.net/gh/2822132073/image/202404071648258.png)
 
-![image-20220426203824505](.\overlayfs.assets\image-20220426203824505.png)
+![image-20240407165036064](https://cdn.jsdelivr.net/gh/2822132073/image/202404071650087.png)
 
->  在修改lower文件后,文件会先被拷贝到upper层,再进行修改
 
-![image-20220426203947123](.\overlayfs.assets\image-20220426203947123.png)
+
+>  在修改lower文件后，文件会先被拷贝到upper层，再进行修改
+
+![image-20240407165211726](https://cdn.jsdelivr.net/gh/2822132073/image/202404071652964.png)
 
 ### 结论
 

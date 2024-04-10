@@ -4,7 +4,7 @@
 
 ## 拓扑图
 
-![image-20210529172133510](D:\markdown\交换机和路由器基本操作\三层交换配置vlan间通信.assets\image-20210529172133510.png)
+![image-20210529172133510](https://cdn.jsdelivr.net/gh/2822132073/image/202404101348290.png)
 
 > 不借助路由器完成不同vlan之间的通信
 
@@ -39,7 +39,7 @@ Switch(config-if)#exit
 Switch(config)#ip routing
 ```
 
-![image-20210531143201395](D:\markdown\交换机和路由器基本操作\三层交换配置vlan间通信.assets\image-20210531143201395.png)
+![image-20210531143201395](https://cdn.jsdelivr.net/gh/2822132073/image/202404101348264.png)
 
 > 在上面的实验拓扑中,想要让两台`PC`通信,需要在两个三层交换机上都配置网关,例如:
 >

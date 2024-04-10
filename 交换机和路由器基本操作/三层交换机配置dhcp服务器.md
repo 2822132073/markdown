@@ -4,9 +4,11 @@
 
 ## 拓扑图
 
-![image-20210529195653910](D:\markdown\交换机和路由器基本操作\三层交换机配置dhcp服务器.assets\image-20210529195653910.png)
+![image-20210529195653910](https://cdn.jsdelivr.net/gh/2822132073/image/202404101348233.png)
 
-> 实现`vlan30`的主机分配到`192.168.30.0/24`的地址
+> 实现
+>
+> `vlan30`的主机分配到`192.168.30.0/24`的地址
 >
 > `vlan40`的主机分配到`192.168.40.0/24`的地址
 >
@@ -18,7 +20,7 @@
 
 > ### 配置trunk口
 >
-> ```
+> ```c
 > Switch(config-if)#switchport trunk encapsulation dot1q  //这里和二层交换机不同需要声明,vlan数据帧的封装类型,虽然只要一种
 > Switch(config-if)#switchport mode trunk 
 > Switch(config-if)#switchport trunk allowed vlan all
@@ -26,7 +28,7 @@
 >
 > ### 开启DHCP
 >
-> ```
+> ```c
 > //全局下开启DHCP服务，该服务默认是关闭的
 > Switch_Dhcp(config)#service dhcp
 > //关闭DHCP分配冲突，日志记录消息
@@ -35,10 +37,10 @@
 >
 > ### 配置各个Vlan的ip(此ip为网关)
 >
-> ```
-> Switch(config)#vlan 30
-> Switch(config-vlan)#vlan 40
-> Switch(config-vlan)#exit
+> ```c
+> Switch(config)#vlan 30 //创建vlan 30
+> Switch(config-vlan)#vlan 40 //创建vlan 40
+> Switch(config-vlan)#exit 
 > Switch(config)#interface vlan 30  //配置vlan虚拟接口
 > Switch(config-if)#ip address 192.168.30.1 255.255.255.0 //为虚拟接口配置IP
 > Switch(config-if)#no shutdown //开启端口
@@ -51,14 +53,14 @@
 >
 > ### 配置DHCP地址池
 >
-> ```
+> ```c
 > Switch(config)#ip dhcp pool 30  //这里的30为地址池的名字,可以为任意字符
 > Switch(dhcp-config)#network 192.168.30.0 255.255.255.0  //配置dhcp地址池的网段
 > Switch(dhcp-config)#default-router 192.168.30.1  //配置默认网关
 > Switch(dhcp-config)#dns-server 223.5.5.5 //配置DNS
 > ```
 >
-> ```
+> ```c
 > Switch(config)#ip dhcp pool 40  //这里的30为地址池的名字,可以为任意字符
 > Switch(dhcp-config)#network 192.168.40.0 255.255.255.0  //配置dhcp地址池的网段
 > Switch(dhcp-config)#default-router 192.168.40.1  //配置默认网关

@@ -4,7 +4,7 @@
 
 ## 拓扑图
 
-![image-20210529195653910](C:\Users\86134\AppData\Roaming\Typora\typora-user-images\image-20210529195653910.png)
+![image-20210529195653910](https://cdn.jsdelivr.net/gh/2822132073/image/202404101348972.png)
 
 > 实现`vlan30`的主机分配到`192.168.30.0/24`的地址
 >

@@ -40,14 +40,23 @@ docker-compose --version
 
 ```bash
 mkdir -p ~/.docker/cli-plugins/
-curl -SL https://get.daocloud.io/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-`uname -s`-`uname -m` > $HOME/.docker/cli-plugins/docker-compose
 
 chmod +x ~/.docker/cli-plugins/docker-compose
 
 docker compose version
 ```
 
-
+> 安装到全局
+>
+> ```shell
+> curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-`uname -s`-`uname -m` > docker-compose
+> sudo mv docker-compose /usr/libexec/docker/cli-plugins
+> sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+> sudo chown root:root /usr/libexec/docker/cli-plugins/docker-compose
+> ```
+>
+> 
 
 
 ## 安装Docker-machine
