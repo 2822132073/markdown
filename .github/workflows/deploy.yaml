@@ -35,29 +35,29 @@ jobs:
       - uses: pnpm/action-setup@v3 
         with:
           version: 8
-          package_json_file: vitepress/package.json
+          package_json_file: docs/package.json
       - name: move markdown file to dest 
-        run: cd vitepress && mv ../* . || tree ./*
+        run: cd docs && mv ../* . || tree ./*
         continue-on-error: true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm # 或 pnpm / yarn
-          cache-dependency-path: /home/runner/work/markdown/markdown/vitepress/package.json
+          cache-dependency-path: /home/runner/work/markdown/markdown/docs/package.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run:   pnpm install  # 或 pnpm install / yarn install / bun install
-        working-directory: /home/runner/work/markdown/markdown/vitepress/
+        working-directory: /home/runner/work/markdown/markdown/docs/
       - name: Build with VitePress
         run: pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
-        working-directory: /home/runner/work/markdown/markdown/vitepress
+        working-directory: /home/runner/work/markdown/markdown/docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: vitepress/.vitepress/dist
+          path: docs/.vitepress/dist
 
   # 部署工作
   deploy:
