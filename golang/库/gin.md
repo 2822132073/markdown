@@ -1708,7 +1708,7 @@ type formB struct {
 func SomeHandler(c *gin.Context) {
   objA := formA{}
   objB := formB{}
-  // c.ShouldBind消耗c.Request.Body,将不会被使用第二次
+  // c.ShouldBind读取了c.Request.Body中的内容，无论是否被绑定成功,都不会被下面的绑定成功
   if errA := c.ShouldBind(&objA); errA == nil {
     c.String(http.StatusOK, `the body should be formA`)
   // 错误EOF将一直出现在这个地方

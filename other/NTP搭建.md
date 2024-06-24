@@ -34,64 +34,22 @@
    > server开头的所有
 
 ```shell
-# For more information about this file, see the man pages
-# ntp.conf(5), ntp_acc(5), ntp_auth(5), ntp_clock(5), ntp_misc(5), ntp_mon(5).
-
 driftfile /var/lib/ntp/drift
 
-# Permit time synchronization with our time source, but do not
-# permit the source to query or modify the service on this system.
 restrict default nomodify notrap nopeer noquery
 
-# Permit all access over the loopback interface.  This could
-# be tightened as well, but to do so would effect some of
-# the administrative functions.
 restrict 192.168.10.0 mask 255.255.255.0 notrust nomodify notrap  
 restrict 127.0.0.1 
 restrict ::1
 
-# Hosts on local network are less restricted.
-#restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap
-
-# Use public servers from the pool.ntp.org project.
-# Please consider joining the pool (http://www.pool.ntp.org/join.html).
 server 127.127.1.0          #同步本地时钟时间
 Fudge 127.127.1.0 stratum 10
-#server 192.168.1.134
-#broadcast 192.168.1.255 autokey	# broadcast server
-#broadcastclient			# broadcast client
-#broadcast 224.0.1.1 autokey		# multicast server
-#multicastclient 224.0.1.1		# multicast client
-#manycastserver 239.255.254.254		# manycast server
-#manycastclient 239.255.254.254 autokey # manycast client
-
-# Enable public key cryptography.
-#crypto
 
 includefile /etc/ntp/crypto/pw
 
-# Key file containing the keys and key identifiers used when operating
-# with symmetric key cryptography. 
 keys /etc/ntp/keys
 
-# Specify the key identifiers which are trusted.
-#trustedkey 4 8 42
-
-# Specify the key identifier to use with the ntpdc utility.
-#requestkey 8
-
-# Specify the key identifier to use with the ntpq utility.
-#controlkey 8
-
-# Enable writing of statistics records.
-#statistics clockstats cryptostats loopstats peerstats
-
-# Disable the monitoring facility to prevent amplification attacks using ntpdc
-# monlist command when default restrict does not include the noquery flag. See
-# CVE-2013-5211 for more details.
-# Note: Monitoring will not be disabled with the limited restriction flag.
 disable monitor
-
 
 ```
 
@@ -101,6 +59,19 @@ disable monitor
 ]# systemctl start ntpd
 ]# systemctl enable ntpd
 ```
+
+## 查看
+
+> 说明同步的是本地时钟
+
+```shell
+[root@ceph-0 /etc]# ntpq -p
+     remote           refid      st t when poll reach   delay   offset  jitter
+==============================================================================
+ LOCAL(0)        .LOCL.           5 l    1   64    1    0.000    0.000   0.008
+```
+
+
 
 ## NTP客户端操作
 
@@ -134,22 +105,14 @@ cat /etc/chrony.conf
    > server 192.168.10.134 iburst
 
 ```shell
-# Use public servers from the pool.ntp.org project.
-# Please consider joining the pool (http://www.pool.ntp.org/join.html).
-server 192.168.10.134 iburst
-#server 0.centos.pool.ntp.org iburst
-#server 1.centos.pool.ntp.org iburst
-#server 2.centos.pool.ntp.org iburst
-#server 3.centos.pool.ntp.org iburst
 
-# Record the rate at which the system clock gains/losses time.
+server 192.168.10.134 iburst
+
 driftfile /var/lib/chrony/drift
 
-# Allow the system clock to be stepped in the first three updates
-# if its offset is larger than 1 second.
+
 makestep 1.0 3
 
-# Enable kernel synchronization of the real-time clock (RTC).
 rtcsync
 
 # Enable hardware timestamping on all interfaces that support it.
