@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 20
           cache: npm # 或 pnpm / yarn
-          cache-dependency-path: package.json
+          cache-dependency-path: /home/runner/work/markdown/markdown/vitepress/package.json
       - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释
       - name: Setup Pages
         uses: actions/configure-pages@v4
