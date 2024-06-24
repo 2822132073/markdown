@@ -51,7 +51,7 @@ jobs:
         run:   pnpm install  # 或 pnpm install / yarn install / bun install
         working-directory: /home/runner/work/markdown/markdown/docs/
       - name: Build with VitePress
-        run: cd /home/runner/work/markdown/markdown/docs && pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
+        run: cd /home/runner/work/markdown/markdown/docs && pnpm build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
