@@ -41,9 +41,9 @@ jobs:
           node-version: 20
           cache: npm # 或 pnpm / yarn
           cache-dependency-path: /home/runner/work/markdown/markdown/vitepress/package.json
-      - uses: pnpm/action-setup@v3 
-        with:
-          package_json_file: /home/runner/work/markdown/markdown/vitepress/package.json
+      # - uses: pnpm/action-setup@v3 
+      #   with:
+      #     package_json_file: /home/runner/work/markdown/markdown/vitepress/package.json
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
