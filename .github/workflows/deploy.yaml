@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
+      - name: move markdown file to dest 
+        run: cd vitepress && mv ../* .
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -42,8 +44,6 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Install dependencies
         run: npm ci # 或 pnpm install / yarn install / bun install
-      - name: move markdown file to dest 
-        run: cd vitepress && mv ../* .
       - name: Build with VitePress
         run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
       - name: Upload artifact
