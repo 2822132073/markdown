@@ -21,6 +21,7 @@ export default defineConfig({
   vite: {
     plugins: [
       AutoSidebar({
+        path: '/',
         ignoreList: ['.git', 'node_modules']
       })
     ]
