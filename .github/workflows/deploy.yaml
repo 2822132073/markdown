@@ -34,6 +34,7 @@ jobs:
           fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
       - uses: pnpm/action-setup@v3 
         with:
+          version: 8
           package_json_file: vitepress/package.json
       - name: move markdown file to dest 
         run: cd vitepress && mv ../* . || tree ./*
