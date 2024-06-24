@@ -37,13 +37,13 @@ jobs:
           version: 8
           package_json_file: docs/package.json
       - name: move markdown file to dest 
-        run: cd docs && mv ../* . || tree ./* && ll /home/runner/work/markdown/markdown/docs/package.json
+        run: cd docs && pwd && mv ../* .  || tree ./* 
         continue-on-error: true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm # 或 pnpm / yarn
+          cache: pnpm # 或 pnpm / yarn
           cache-dependency-path: /home/runner/work/markdown/markdown/docs/package.json
       - name: Setup Pages
         uses: actions/configure-pages@v4
