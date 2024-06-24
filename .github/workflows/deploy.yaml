@@ -52,7 +52,7 @@ jobs:
         working-directory: /home/runner/work/markdown/markdown/docs/
       - name: Build with VitePress
         run: pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
-        working-directory: /home/runner/work/markdown/markdown/docs/
+        working-directory: /home/runner/work/markdown/markdown/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
