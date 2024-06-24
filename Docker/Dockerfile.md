@@ -93,7 +93,6 @@ FROM <repository>@<digest>
  
 
 ### **2.3 示例**
-
 ```dockerfile
 # Description: test image
 FROM busybox:latest
