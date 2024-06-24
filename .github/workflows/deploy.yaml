@@ -44,7 +44,7 @@ jobs:
         with:
           node-version: 20
           cache: pnpm # 或 pnpm / yarn
-          cache-dependency-path: /home/runner/work/markdown/markdown/docs/pnpm-lock.yaml
+          cache-dependency-path: docs/pnpm-lock.yaml
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
