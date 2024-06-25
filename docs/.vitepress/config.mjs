@@ -3,6 +3,7 @@ import AutoSidebar from 'vite-plugin-vitepress-auto-sidebar';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base : "/markdown/",
   title: "Fsl's Markdown site",
   description: "我的markdown笔记网站",
   themeConfig: {
