@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 # 定义包含要删除文件路径的文件
 FILES_TO_DELETE="not_able_render_files.txt"
 
