@@ -90,9 +90,6 @@ FROM <repository>@<digest>
 -  `tag`：base image的标签，省略时默认latest；
 -  `digest`：是镜像的哈希码；使用哈希码会更安全一点；
 
- 
-
-
 ## **3、MAINTAINER**
 
 ### **3.1 介绍**
