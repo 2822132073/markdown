@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 定义包含要删除文件路径的文件
-FILES_TO_DELETE="files_to_delete.txt"
+FILES_TO_DELETE="not_able_render_files.txt"
 
 # 检查文件是否存在
 if [ ! -f "$FILES_TO_DELETE" ]; then
