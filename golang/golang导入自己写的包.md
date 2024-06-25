@@ -1,8 +1,8 @@
-![image-20220516203713445](D:\markdown\golang\golang导入自己写的包.assets\image-20220516203713445.png)
+![image-20220516203713445](https://cdn.jsdelivr.net/gh/2822132073/image/202406252133134.png)
 
 
 
-![image-20220516203753726](D:\markdown\golang\golang导入自己写的包.assets\image-20220516203753726.png)
+![image-20220516203753726](https://cdn.jsdelivr.net/gh/2822132073/image/202406252133988.png)
 
 我们在GoMOD模式下,有一个main.go,想要调用 down包里面的 downloader中的函数,我们只需要这样
 
@@ -25,4 +25,4 @@ func main() {
 
 而在Downloader.go文件中他的packge应该为它目录的地址
 
-![image-20220516204051164](D:\markdown\golang\golang导入自己写的包.assets\image-20220516204051164.png)
+![image-20220516204051164](https://cdn.jsdelivr.net/gh/2822132073/image/202406252133194.png)

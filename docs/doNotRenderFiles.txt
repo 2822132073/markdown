@@ -1,0 +1,10 @@
+databases\mysql\mysql搭建.md
+Elasticsearch\curl查看elasticsearch信息.md
+Docker\Dockerfile.md
+golang\库\gin.md
+golang\库\template.md
+Linux命令\git.md
+kubernetes\prometheus\Prometheus数据查询.md
+other\querySelector.md
+other\vim相关设置.md
+kubernetes\prometheus\数据采集过程.md

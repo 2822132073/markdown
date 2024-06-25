@@ -158,7 +158,7 @@ systemctl stop mysqld
 mysql -uroot -pa123456! -e "SHOW STATUS LIKE 'wsrep_cluster_size';"
 ```
 
-![image-20210415170000738](C:\Users\86134\Desktop\image-20210415170000738.png)
+
 
 
 

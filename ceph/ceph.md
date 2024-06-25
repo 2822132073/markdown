@@ -1,4 +1,4 @@
-![图片](D:\markdown\ceph\ceph.assets\640.webp)
+![图片](https://cdn.jsdelivr.net/gh/2822132073/image/202406252125829.webp)
 
 1. pool和pg(placement group)都是逻辑上的概念,实际数据都是存在于osd上的
 2. ceph内部的冗余是在pg层上进行的
