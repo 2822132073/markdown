@@ -1,4 +1,4 @@
-![这里写图片描述](D:\markdown\Docker\Dockerd,coniainerd关系.assets\aHR0cDovL2ltZy5ibG9nLmNzZG4ubmV0LzIwMTgwMTA4MTIxNDUyMzc0)
+![这里写图片描述](https://cdn.jsdelivr.net/gh/2822132073/image/202406251906137)
 
 > `docker`和`dockerd`不是相同的程序
 >

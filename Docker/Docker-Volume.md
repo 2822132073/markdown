@@ -23,7 +23,7 @@
 
 ### 三种模式示意图
 
-![img](D:\markdown\images\381412-20190808225945967-659254433.png)
+![img](https://cdn.jsdelivr.net/gh/2822132073/image/202406251904714.webp)
 
 ## 演示
 
