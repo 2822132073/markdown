@@ -40,7 +40,7 @@ jobs:
         run: cd docs && pwd && mv ../* .  || tree ./* 
         continue-on-error: true
       - name: delete not able render file
-        run: bash deleteNotRenderFile.sh
+        run: pwd && tree ./ && bash deleteNotRenderFile.sh
         working-directory: /home/runner/work/markdown/markdown/docs/
       - name: Setup Node
         uses: actions/setup-node@v4
