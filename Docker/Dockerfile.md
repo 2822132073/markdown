@@ -74,7 +74,7 @@ docker build [OPTIONS] PATH | URL | -
 -  FROM可以在一个 Dockerfile 中出现多次，如果有需求在一个 Dockerfile 中创建多个镜像。
 -  如果FROM语句没有指定镜像标签，则**默认使用latest标签**。
 
- 
+
 
 ### **2.2 格式**
 
@@ -83,40 +83,13 @@ FROM <repository>[:<tag>]
 OR
 FROM <repository>@<digest>
 ```
-
 注：
 
 -  `repository`：指定作为base image的名称；
 -  `tag`：base image的标签，省略时默认latest；
 -  `digest`：是镜像的哈希码；使用哈希码会更安全一点；
 
-
-
-
-
-
-
-
-
-
 ## **3、MAINTAINER**
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ### **3.1 介绍**
 
