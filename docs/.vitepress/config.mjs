@@ -38,7 +38,7 @@ export default defineConfig({
         {text: '前端', link: '/前端/echarts/dataset.html'},
       ] 
     },
-    { text: '其他',  link: '/other'},
+    { text: '其他',  link: '/other/Linux磁盘分区.html'},
     ],
 
     sidebar: [
