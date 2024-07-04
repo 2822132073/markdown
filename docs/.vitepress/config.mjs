@@ -1,6 +1,12 @@
 import { defineConfig } from 'vitepress'
 import AutoSidebar from 'vite-plugin-vitepress-auto-sidebar';
 
+
+const tocRegex = /^\[toc\]$/i
+const tocOptions = {
+  pattern: tocRegex,
+  level: [2, 3],
+}
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   // base : "/markdown/", //如果域名后面有地址，这里就需要填写，例如2822132073.github.io/markdown 这里就需要填markdown
@@ -55,5 +61,8 @@ export default defineConfig({
         ignoreList: ['.git', 'node_modules']
       })
     ]
+  },
+    markdown: {
+    toc: tocOptions
   },
 })
