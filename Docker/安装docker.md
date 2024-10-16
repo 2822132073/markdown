@@ -88,13 +88,17 @@ sudo yum  install -y docker-ce docker-ce-cli containerd.io
 
 
 ## 修改镜像源
-
+| 阿里云的加速都不能用了，只有在云上的用户可以使用
 ```shell
 cat >/etc/docker/daemon.json <<EOF
 {
-  "registry-mirrors": ["https://esc1pe31.mirror.aliyuncs.com"]
+  "registry-mirrors": [
+    "https://docker.m.daocloud.io"
+  ]
 }
 EOF
+systemctl daemon-reload
+systemctl restart docker
 ```
 
 
