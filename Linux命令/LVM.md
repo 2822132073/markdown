@@ -175,6 +175,18 @@ sdd               8:48   0   20G  0 disk
   Labels on physical volume "/dev/sdb1" successfully wiped.
 ```
 
+### 扩容PV
+
+> 在虚拟机中或者分区中，可能大小会有变化，需要使用resize调整磁盘大小。
+
+```shell
+[root@localhost ~] #pvresize /dev/sdb1    //扩容一个pv
+  Physical volume "/dev/sdb1" changed
+  1 physical volume(s) resized or updated / 0 physical volume(s) not resized
+
+```
+
+
 ## VG
 
 ### 将PV加入VG
