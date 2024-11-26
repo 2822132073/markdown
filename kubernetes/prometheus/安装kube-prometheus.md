@@ -191,6 +191,7 @@ kubectl apply -f prometheusRule/
 
 
 ##  查看 Prometheus & Grafana
+> 请在编写的时候注意，prometheus以及grafana的manifest文件中是否有networkPolicy相关的配置，如果有，需要进行相关配置，或者直接删除这个配置，不然无法访问
 
 > 如果条件不允许可以使用NodePort方式对服务进行暴露
 
