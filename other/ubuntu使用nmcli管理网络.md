@@ -60,11 +60,8 @@
 > [root@root ~]# cat /etc/netplan/00-installer-config.yaml 
 > # This is the network config written by 'subiquity'
 > network:
-> renderer: NetworkManager
-> version: 2
-> ethernets:
->  ens33:
->    dhcp4: true
+>   renderer: NetworkManager
+>   version: 2
 > ```
 >
 > 应用配置文件
@@ -77,4 +74,7 @@
 > Configuration accepted.
 > [root@root ~]# netplan apply
 > ```
+>
+> 如果使用 `nmcli donnection` 查看到的连接不生效，请使用 `nmcli c up <connect-name>` 启动这个 `connect`
+> 一般来说肯定是有与`connect`相关联的`device`的，如果没有，请手动创建
 
