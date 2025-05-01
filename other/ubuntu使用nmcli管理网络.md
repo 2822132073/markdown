@@ -39,9 +39,9 @@
 >
 > **而且需要确保每个连接的`connection.autoconnect`属性为`yes`**
 
-## ubuntu18.04
+## ubuntu18.04/22.04
 
-> 在`ubuntu18.04`中默认使用`netplan`管理网络,想要使用`NetworkManager`管理网络,需要先安装
+> 在`ubuntu18.04/22.04`中默认使用`netplan`管理网络,想要使用`NetworkManager`管理网络,需要先安装
 >
 > ```shell
 > apt install -y network-manager
