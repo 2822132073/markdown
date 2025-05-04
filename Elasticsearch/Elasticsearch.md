@@ -1,14 +1,19 @@
 # Elasticsearch安装
 
+
+
 ## 官方文档地址
+
 ```shell
 https://www.elastic.co/guide/en/elasticsearch/reference/7.14/install-elasticsearch.html#_installing_elasticsearch_yourself
 ```
 
 ## 源地址,可以在这里下载对应的rpm包直接安装
+
 > https://mirrors.tuna.tsinghua.edu.cn/elasticstack
 
 ## repo配置文件
+
 ```shell
 cat >/etc/yum.repos.d/elasticsearch.repo <<EOF
 [elasticsearch]

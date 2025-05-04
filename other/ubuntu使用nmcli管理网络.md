@@ -41,6 +41,25 @@
 
 ## ubuntu18.04/22.04
 
+使用`netplan`管理网络时，可能这个配置文件不是直接生成的，而是通过一个cloud-ini生成的，我们需要修改这个文件，一般`netplan`为以下内容时需要注意：
+
+```yaml
+# This file is generated from information provided by the datasource.  Changes
+# to it will not persist across an instance reboot.  To disable cloud-init's
+# network configuration capabilities, write a file
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
+network:
+    ethernets:
+        ens33:
+            dhcp4: true
+    version: 2
+```
+
+直接按照它的指示添加文件写入内容即可
+
+
+
 > 在`ubuntu18.04/22.04`中默认使用`netplan`管理网络,想要使用`NetworkManager`管理网络,需要先安装
 >
 > ```shell
